@@ -151,19 +151,20 @@
 
   // Particle class for fireworks
   class Particle {
-    constructor(x, y, color) {
+    constructor(x, y, color, velocityMultiplier = 1, sizeMultiplier = 1) {
       this.x = x;
       this.y = y;
       this.color = color;
       const angle = Math.random() * Math.PI * 2;
-      const velocity = Math.random() * 6 + 2;
+      const velocity = (Math.random() * 6 + 2) * velocityMultiplier;
       this.vx = Math.cos(angle) * velocity;
       this.vy = Math.sin(angle) * velocity;
       this.gravity = 0.1;
       this.friction = 0.98;
       this.alpha = 1;
       this.decay = Math.random() * 0.02 + 0.01;
-      this.size = Math.random() * 3 + 1;
+      this.size = (Math.random() * 3 + 1) * sizeMultiplier;
+      this.hasSparkle = Math.random() < 0.15; // 15% chance to sparkle
     }
 
     update() {
@@ -178,7 +179,16 @@
     draw(context) {
       context.save();
       context.globalAlpha = this.alpha;
-      context.fillStyle = this.color;
+
+      if (this.hasSparkle) {
+        // Sparkle effect - alternating brightness
+        context.fillStyle = Math.random() > 0.5 ? '#ffffff' : this.color;
+        context.shadowColor = this.color;
+        context.shadowBlur = 10;
+      } else {
+        context.fillStyle = this.color;
+      }
+
       context.beginPath();
       context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       context.fill();
@@ -196,26 +206,52 @@
 
     const colors = [
       '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff',
-      '#5f27cd', '#00d2d3', '#ff9f43', '#10ac84', '#ee5a24'
+      '#5f27cd', '#00d2d3', '#ff9f43', '#10ac84', '#ee5a24',
+      '#ff7675', '#fd79a8', '#a29bfe', '#74b9ff', '#00cec9',
+      '#fdcb6e', '#e17055', '#d63031', '#6c5ce7', '#0984e3'
     ];
 
-    // Create multiple bursts across the entire screen
-    const burstCount = 8;  // Number of bursts across the screen
-    const particleCount = 40;  // Particles per burst
+    // Create more varied bursts across the entire screen
+    const burstCount = 15;  // More bursts
 
     for (let burst = 0; burst < burstCount; burst++) {
       // Random position across the screen
       const burstX = Math.random() * window.innerWidth;
       const burstY = Math.random() * window.innerHeight;
 
-      // Play pop sound for each burst with slight delay
+      // Variety: each burst has different characteristics
+      const variety = Math.random();
+
+      let particleCount = 40;
+      let velocityMultiplier = 1;
+      let sizeMultiplier = 1;
+
+      if (variety < 0.25) {
+        // Big explosion
+        particleCount = 80;
+        velocityMultiplier = 1.5;
+        sizeMultiplier = 1.5;
+      } else if (variety < 0.5) {
+        // Small burst
+        particleCount = 25;
+        velocityMultiplier = 0.7;
+        sizeMultiplier = 0.7;
+      } else if (variety < 0.75) {
+        // Fast burst
+        particleCount = 50;
+        velocityMultiplier = 2;
+        sizeMultiplier = 0.8;
+      }
+
+      // Play pop sound with slight delay
       setTimeout(() => {
         playPopSound();
-      }, burst * 50);
+      }, burst * 40);
 
+      // Create burst particles with variety
       for (let i = 0; i < particleCount; i++) {
         const color = colors[Math.floor(Math.random() * colors.length)];
-        particles.push(new Particle(burstX, burstY, color));
+        particles.push(new Particle(burstX, burstY, color, velocityMultiplier, sizeMultiplier));
       }
     }
 

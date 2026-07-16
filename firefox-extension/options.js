@@ -260,19 +260,46 @@
     document.body.appendChild(canvas);
 
     const particles = [];
-    const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43', '#10ac84', '#ee5a24'];
+    const colors = [
+      '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff',
+      '#5f27cd', '#00d2d3', '#ff9f43', '#10ac84', '#ee5a24',
+      '#ff7675', '#fd79a8', '#a29bfe', '#74b9ff', '#00cec9',
+      '#fdcb6e', '#e17055', '#d63031', '#6c5ce7', '#0984e3'
+    ];
 
-    // Create multiple bursts across the screen
-    const burstCount = 8;
-    const particleCount = 40;
+    // Create varied bursts across the screen
+    const burstCount = 15;
 
     for (let burst = 0; burst < burstCount; burst++) {
       const burstX = Math.random() * window.innerWidth;
       const burstY = Math.random() * window.innerHeight;
 
+      // Variety: each burst has different characteristics
+      const variety = Math.random();
+
+      let particleCount = 40;
+      let velocityMultiplier = 1;
+      let sizeMultiplier = 1;
+
+      if (variety < 0.25) {
+        particleCount = 80;
+        velocityMultiplier = 1.5;
+        sizeMultiplier = 1.5;
+      } else if (variety < 0.5) {
+        particleCount = 25;
+        velocityMultiplier = 0.7;
+        sizeMultiplier = 0.7;
+      } else if (variety < 0.75) {
+        particleCount = 50;
+        velocityMultiplier = 2;
+        sizeMultiplier = 0.8;
+      }
+
+      setTimeout(() => playPopSound(), burst * 40);
+
       for (let i = 0; i < particleCount; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const velocity = Math.random() * 6 + 2;
+        const velocity = (Math.random() * 6 + 2) * velocityMultiplier;
         particles.push({
           x: burstX, y: burstY,
           vx: Math.cos(angle) * velocity,
@@ -280,14 +307,10 @@
           color: colors[Math.floor(Math.random() * colors.length)],
           alpha: 1,
           decay: Math.random() * 0.02 + 0.01,
-          size: Math.random() * 3 + 1
+          size: (Math.random() * 3 + 1) * sizeMultiplier,
+          hasSparkle: Math.random() < 0.15
         });
       }
-    }
-
-    // Play sound for each burst
-    for (let burst = 0; burst < burstCount; burst++) {
-      setTimeout(() => playPopSound(), burst * 50);
     }
 
     function animate() {
@@ -306,7 +329,15 @@
         if (p.alpha > 0) {
           ctx.save();
           ctx.globalAlpha = p.alpha;
-          ctx.fillStyle = p.color;
+
+          if (p.hasSparkle) {
+            ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 10;
+          } else {
+            ctx.fillStyle = p.color;
+          }
+
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fill();
