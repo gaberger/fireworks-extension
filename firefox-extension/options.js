@@ -454,6 +454,13 @@
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+      // Resume if suspended
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      console.log('Test: Playing pop sound, context state:', audioCtx.state);
+
       // Create oscillator for the main pop
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
@@ -465,7 +472,8 @@
       oscillator.frequency.setValueAtTime(400 + Math.random() * 200, audioCtx.currentTime);
       oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
 
-      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      // INCREASED VOLUME
+      gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
 
       oscillator.start(audioCtx.currentTime);
@@ -475,7 +483,7 @@
       const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
       const noiseData = noiseBuffer.getChannelData(0);
       for (let i = 0; i < noiseData.length; i++) {
-        noiseData[i] = (Math.random() * 2 - 1) * 0.1;
+        noiseData[i] = (Math.random() * 2 - 1) * 0.15;
       }
 
       const noiseSource = audioCtx.createBufferSource();
@@ -485,7 +493,7 @@
       noiseSource.connect(noiseGain);
       noiseGain.connect(audioCtx.destination);
 
-      noiseGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      noiseGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
       noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
 
       noiseSource.start(audioCtx.currentTime);
