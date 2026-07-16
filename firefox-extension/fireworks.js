@@ -32,9 +32,14 @@
       const img = new Image();
       img.onload = () => {
         logoImage = img;
+        console.log('✅ Logo loaded successfully');
         resolve(img);
       };
-      img.onerror = reject;
+      img.onerror = (e) => {
+        console.error('❌ Logo failed to load:', e);
+        reject(e);
+      };
+      console.log('📥 Loading logo from data URL...');
       img.src = logoSvgData;
     });
   }
@@ -402,6 +407,8 @@
 
   // Show logo in center of screen
   function showLogo() {
+    console.log('🎆 showLogo called, logoImage:', !!logoImage);
+
     if (!logoCanvas) {
       logoCanvas = document.createElement('canvas');
       logoCanvas.id = 'fireworks-logo';
@@ -411,14 +418,14 @@
         left: 50%;
         transform: translate(-50%, -50%);
         pointer-events: none;
-        z-index: 999998;
+        z-index: 2147483647;
       `;
       document.body.appendChild(logoCanvas);
       logoCtx = logoCanvas.getContext('2d');
     }
 
-    logoCanvas.width = 400;
-    logoCanvas.height = 100;
+    logoCanvas.width = 500;
+    logoCanvas.height = 120;
     logoAlpha = 1;
     logoShowing = true;
     logoStartTime = Date.now();
@@ -426,11 +433,16 @@
 
   // Draw the logo
   function drawLogo() {
-    if (!logoShowing || !logoCtx || !logoImage) return;
+    if (!logoShowing || !logoCtx) {
+      console.log('⚠️ drawLogo: not showing or no ctx', { logoShowing, hasCtx: !!logoCtx });
+      return;
+    }
 
     logoCtx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
     logoCtx.save();
     logoCtx.globalAlpha = logoAlpha;
+
+    console.log('Drawing logo, alpha:', logoAlpha, 'image loaded:', !!logoImage);
 
     // Calculate scale animation
     const elapsed = Date.now() - logoStartTime;
@@ -444,18 +456,26 @@
     logoCtx.scale(scale, scale);
     logoCtx.translate(-centerX, -centerY);
 
-    // Draw Forward Networks logo
-    const logoWidth = 340;
-    const logoHeight = 44;
-    const x = (logoCanvas.width - logoWidth) / 2;
-    const y = (logoCanvas.height - logoHeight) / 2;
+    if (logoImage) {
+      // Draw Forward Networks logo
+      const logoWidth = 340;
+      const logoHeight = 44;
+      const x = (logoCanvas.width - logoWidth) / 2;
+      const y = (logoCanvas.height - logoHeight) / 2;
 
-    // Add glow effect
-    logoCtx.shadowColor = '#ff3506';
-    logoCtx.shadowBlur = 25;
+      // Add glow effect
+      logoCtx.shadowColor = '#ff3506';
+      logoCtx.shadowBlur = 25;
 
-    // Draw the logo
-    logoCtx.drawImage(logoImage, x, y, logoWidth, logoHeight);
+      logoCtx.drawImage(logoImage, x, y, logoWidth, logoHeight);
+    } else {
+      // Fallback: draw text
+      logoCtx.fillStyle = '#ff3506';
+      logoCtx.font = 'bold 32px Arial';
+      logoCtx.textAlign = 'center';
+      logoCtx.textBaseline = 'middle';
+      logoCtx.fillText('FORWARD NETWORKS', 200, 50);
+    }
 
     logoCtx.restore();
   }
@@ -486,8 +506,8 @@
       return;
     }
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';  // Slower fade for trails
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Use clearRect for full transparency (no dark background)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     particles = particles.filter(particle => {
       particle.update();
