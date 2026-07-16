@@ -141,11 +141,19 @@
       '#5f27cd', '#00d2d3', '#ff9f43', '#10ac84', '#ee5a24'
     ];
 
-    const particleCount = 50;
+    // Create multiple bursts across the entire screen
+    const burstCount = 8;  // Number of bursts across the screen
+    const particleCount = 40;  // Particles per burst
 
-    for (let i = 0; i < particleCount; i++) {
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      particles.push(new Particle(x, y, color));
+    for (let burst = 0; burst < burstCount; burst++) {
+      // Random position across the screen
+      const burstX = Math.random() * window.innerWidth;
+      const burstY = Math.random() * window.innerHeight;
+
+      for (let i = 0; i < particleCount; i++) {
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particles.push(new Particle(burstX, burstY, color));
+      }
     }
 
     if (!animationId) {
