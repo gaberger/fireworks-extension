@@ -250,7 +250,7 @@
     }, 3000);
   }
 
-  // Simple test fireworks
+  // Simple test fireworks with full screen effect and sound
   function createTestFireworks(x, y) {
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999999;';
@@ -260,20 +260,34 @@
     document.body.appendChild(canvas);
 
     const particles = [];
-    const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'];
+    const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43', '#10ac84', '#ee5a24'];
 
-    for (let i = 0; i < 30; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const velocity = Math.random() * 6 + 2;
-      particles.push({
-        x, y,
-        vx: Math.cos(angle) * velocity,
-        vy: Math.sin(angle) * velocity,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        alpha: 1,
-        decay: Math.random() * 0.02 + 0.01,
-        size: Math.random() * 3 + 1
-      });
+    // Create multiple bursts across the screen
+    const burstCount = 8;
+    const particleCount = 40;
+
+    for (let burst = 0; burst < burstCount; burst++) {
+      const burstX = Math.random() * window.innerWidth;
+      const burstY = Math.random() * window.innerHeight;
+
+      for (let i = 0; i < particleCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 6 + 2;
+        particles.push({
+          x: burstX, y: burstY,
+          vx: Math.cos(angle) * velocity,
+          vy: Math.sin(angle) * velocity,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1,
+          decay: Math.random() * 0.02 + 0.01,
+          size: Math.random() * 3 + 1
+        });
+      }
+    }
+
+    // Play sound for each burst
+    for (let burst = 0; burst < burstCount; burst++) {
+      setTimeout(() => playPopSound(), burst * 50);
     }
 
     function animate() {
@@ -310,6 +324,52 @@
       }
     }
     animate();
+  }
+
+  // Play a pop sound using Web Audio API
+  function playPopSound() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Create oscillator for the main pop
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(400 + Math.random() * 200, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.15);
+
+      // Add crackle
+      const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
+      const noiseData = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < noiseData.length; i++) {
+        noiseData[i] = (Math.random() * 2 - 1) * 0.1;
+      }
+
+      const noiseSource = audioCtx.createBufferSource();
+      const noiseGain = audioCtx.createGain();
+
+      noiseSource.buffer = noiseBuffer;
+      noiseSource.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
+
+      noiseGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+
+      noiseSource.start(audioCtx.currentTime);
+      noiseSource.stop(audioCtx.currentTime + 0.05);
+    } catch (error) {
+      console.error('Audio error:', error);
+    }
   }
 
   // Initialize
