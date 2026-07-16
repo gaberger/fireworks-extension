@@ -39,6 +39,7 @@ Then load the extension in your browser's developer mode.
 ## 📖 Documentation
 
 - **[Installation Guide](INSTALL.md)** - Detailed installation instructions for all browsers
+- **[FAQ](FAQ.md)** - Common questions and solutions (especially Firefox verification issues)
 - **[Extension README](firefox-extension/README.md)** - Comprehensive features and configuration guide
 
 ## 🎮 Usage
