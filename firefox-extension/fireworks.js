@@ -11,6 +11,64 @@
   let particles = [];
   let animationId = null;
   let currentSettings = null;
+  let audioContext = null;
+
+  // Initialize audio context for sound effects
+  function initAudio() {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioContext;
+  }
+
+  // Play a pop sound using Web Audio API
+  function playPopSound() {
+    try {
+      const ctx = initAudio();
+
+      // Create oscillator for the main pop
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      // Set up the pop sound characteristics
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(400 + Math.random() * 200, ctx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.15);
+
+      // Envelope for a quick pop
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + 0.15);
+
+      // Add a slight crackle for realism
+      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+      const noiseData = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < noiseData.length; i++) {
+        noiseData[i] = (Math.random() * 2 - 1) * 0.1;
+      }
+
+      const noiseSource = ctx.createBufferSource();
+      const noiseGain = ctx.createGain();
+
+      noiseSource.buffer = noiseBuffer;
+      noiseSource.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+
+      noiseGain.gain.setValueAtTime(0.2, ctx.currentTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+
+      noiseSource.start(ctx.currentTime);
+      noiseSource.stop(ctx.currentTime + 0.05);
+    } catch (error) {
+      // Audio might not be available or not yet initialized
+      console.error('Audio error:', error);
+    }
+  }
 
   // Default settings
   const defaultSettings = {
@@ -150,6 +208,11 @@
       const burstX = Math.random() * window.innerWidth;
       const burstY = Math.random() * window.innerHeight;
 
+      // Play pop sound for each burst with slight delay
+      setTimeout(() => {
+        playPopSound();
+      }, burst * 50);
+
       for (let i = 0; i < particleCount; i++) {
         const color = colors[Math.floor(Math.random() * colors.length)];
         particles.push(new Particle(burstX, burstY, color));
@@ -213,6 +276,10 @@
 
     // Check button
     if (isTargetButton(event, currentSettings)) {
+      // Resume audio context if suspended (browser autoplay policy)
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
       createFireworks(event.clientX, event.clientY);
     }
   }
