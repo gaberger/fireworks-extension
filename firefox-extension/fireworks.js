@@ -16,6 +16,28 @@
   let logoCtx = null;
   let logoAlpha = 0;
   let logoShowing = false;
+  let logoImage = null;
+
+  // Forward Networks SVG logo
+  const logoSvgData = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNzAgMjIiPgogICAgPHBhdGggZmlsbD0iI2ZmMzUwNiIgZD0iTTE1MC44ODkgMmgtMTYuOTV2NC4wNTdoMTMuMTE5TDEzMS4wNjkgMjFoNS43NTNsMTMuMDk3LTEzLjA1OXYyMWgtOC42MDlWNi4wOWMwLTEuNzA2LTEuMzkzLTMuMDktMy4wOTktMy4wOSIvPgogICAgPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTYxLjQzIDMuNjY4Yy0uODYtLjg3OS0xLjg4Mi0xLjU1Ny0zLjA1OC0yLjAzOXMtMi40Ni0uNzIxLTMuODUtLjcyMS0yLjY3My4yMzktMy44NS43MjFjLTEuMTc2LjQ4Mi0yLjIwMyAxLjE2LTMuMDcxIDIuMDM5LS44NzMuODc5LTEuNTQ4IDEuOTMyLTIuMDMyIDMuMTYtLjQ4MyAxLjIyOC0uNzIzIDIuNTg1LS43MjMgNC4wNnYuMTk2YzAgMS40OTcuMjQgMi44NjIuNzIzIDQuMDlzMS4xNTkgMi4yODIgMi4wMzIgMy4xNmMuODczLjg3OSAxLjg5NSAxLjU1NyAzLjA3MSAyLjAzOXMyLjQ2LjcyMSAzLjg1LjcyMSAyLjY3My0uMjM5IDMuODUtLjcyMWMxLjE3Ni0uNDgyIDIuMTk0LTEuMTYgMy4wNTgtMi4wMzlzMS41MzYtMS45MzIgMi4wMTUtMy4xNmMuNDgzLTEuMjI4LjcyMy0yLjU5My43MjMtNC4wOXYtLjE5NmMwLTEuNDgtLjI0LTIuODMyLS43MjMtNC4wNi0uNDc5LTEuMjI4LTEuMTUxLTIuMjgyLTIuMDE1LTMuMTZtLTEuMjkyIDcuNDE3YzAgMS4yOTItLjI0IDIuNDAxLS43MjMgMy4zMjctLjQ4My45MjUtMS4xNDYgMS42MjktMS45ODkgMi4xMnMtMS44MTQuNzM0LTIuOTA0LjczNC0yLjA2Ni0uMjQzLTIuOTE3LS43MzRjLS44NTEtLjQ5LTEuNTE4LTEuMTk4LTIuMDAyLTIuMTItLjQ4My0uOTI2LS43MjMtMi4wMzQtLjcyMy0zLjMyN3YtLjE5NmMwLTEuMjc1LjI0LTIuMzc2LjcyMy0zLjMwMS40ODMtLjkyNiAxLjE1MS0xLjYyOSAyLjAwMi0yLjEyLjg1MS0uNDkgMS44MjYtLjczNCAyLjkxNy0uNzM0czIuMDYyLjI0NyAyLjkwNC43MzRjLjg0My40OSAxLjUwNiAxLjE5OCAxLjk4OSAyLjEyLjQ4My45MjYuNzIzIDIuMDI2LjcyMyAzLjMwMXptMjIuNDgzIDIuMDg2YzEuMDcxLS40OTcgMS45LTEuMjIyIDIuNDk1LTIuMTg1LjU5MS0uOTYzLjg4Ni0yLjE0OS44ODYtMy41NTZzLS4yOTUtMi41NjMtLjg4Ni0zLjUxNmMtLjU5MS0uOTU0LTEuNDI0LTEuNjc1LTIuNDk1LTIuMTcxQzU3LjU3MiAxLjI0NiA1Ni4zMjQgMSA1NC44OTIgMUg0NnYyMGg0LjA2OXYtNy4wODZoNC4xNDhMNThLjAxMyAyMWg0LjYxNmwtNC4zMi03LjY5N2MuMTA2LS4wNDQuMjI1LS4wODQuMzM1LS4xMzJabS04LjU3NC04Ljc2OWg0LjYyYy45NTcgMCAxLjcyNC4yODYgMi4zMDYuODU3cS44NzMuODU2NS44NzMgMi4yMjljMCAxLjM3MjUtLjI5MSAxLjcwMS0uODczIDIuMjQyLS41ODIuNTQ1LTEuMzUzLjgxMy0yLjMwNi44MTNoLTQuNjJ6bTM3Ljg1NiAxMC41MjNMODMuNzU5IDFoLTQuNDk3TDc1LjA3IDE0LjkzNCA3MS41MjYgMUg2Ny40bDUuNTI4IDIwaDQuMjE0bDQuMzU1LTE1LjAyOUw4NS44NzkgMjFoNC4xNTdsNS41NTktMjBoLTQuMTI2ek01LjA0MiA0LjY1N2gxMC40OTJWMUgxdjIwaDQuMDQydi03LjQ1NWg5LjgwNFY5Ljk0MUg1LjA0Mm0xMzYuNjAxIDguNTE0YzEuMDcxLS40OTcgMS45LTEuMjIyIDIuNDkxLTIuMTg1cy44OS0yLjE0OS44OS0zLjU1Ni0uMjk1LTIuNTYzLS44OS0zLjUxNmMtLjg4OS0xLjA3Ni0xLjg2LTEuODUzLTIuNDkxLTIuMTcxLTEuMDcxLS40OTctMi4zMjMtLjc0My0zLjc1Ni0uNzQzSDEyOXYyMGg0LjA2OXYtNy4wODZoNC4xNDhMMTQxLjAxMyAyMWg0LjYxbC00LjMyLTcuNjk3Yy4xMTEtLjA0NC4yMy0uMDc5LjM0LS4xMzJtLTguNTc0LTguNzY5aDQuNjE2Yy45NTcgMCAxLjcyNC4yODYgMi4zMDUuODU3LjU4My41NzEuODc0IDEuMzE0Ljg3NCAyLjIyOXMtLjI5MSAxLjcwMS0uODc0IDIuMjQyYy0uNTgyLjU0NS0xLjM1My44MTMtMi4zMDUuODEzaC00LjYxNnptMzUuMDkyIDIuNDUzYy0uNTA2LTEuMi0xLjIwOC0yLjIzNy0yLjEwNy0zLjExMnMtMS45NTctMS41NTItMy4xNzktMi4wMzFDMTU4LjY1NSAxLjIzNyAxNTUuMzIzIDEgMTUyLjg5IDFIMTQ2djIwaDcuODljMS40MTUgMCAyLjczLS4yMzcgMy45NDItLjcxMnMyMi4yNzUtMS4xNTYgMy4xODItMi4wNDRjLjkwOC0uODg4IDEuNjE5LTEuOTMgMi4xMzUtMy4xM3MuNzcxLTIuNTMyLjc3MS00di0uMjg2Yy4wMDQtMS40NTEtLjI1MS0yLjc3NC0uNzU5LTMuOTc0Wm0tMy4zOTQgNC4yNTVjMCAxLjIxOC0uMjY1IDIuMjg2LS43ODkgMy4ycy0xLjI1NyAxLjYzMS0yLjE5MSAyLjE0NWMtLjkzNS41MTQtMi4wMDYuNzY5LTMuMjA5Ljc2OWgtMy41MDlWNC43NjdoMy41MDljMS4yNDQgMCAyLjMyOS4yNTUgMy4yNTQuNzU2LjkyNi41MDUgMS42NDkgMS4yMDkgMi4xNjUgMi4xMTRzLjc3MSAxLjk2NS43NzEgMy4xODd2LjI4NloiLz4KPC9zdmc+`;
+
+  // Load logo image
+  function loadLogoImage() {
+    return new Promise((resolve, reject) => {
+      if (logoImage) {
+        resolve(logoImage);
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        logoImage = img;
+        resolve(img);
+      };
+      img.onerror = reject;
+      img.src = logoSvgData;
+    });
+  }
 
   // Initialize audio context for sound effects
   function initAudio() {
@@ -395,38 +417,50 @@
       logoCtx = logoCanvas.getContext('2d');
     }
 
-    logoCanvas.width = 300;
-    logoCanvas.height = 300;
+    logoCanvas.width = 400;
+    logoCanvas.height = 100;
     logoAlpha = 1;
     logoShowing = true;
+    logoStartTime = Date.now();
   }
 
   // Draw the logo
   function drawLogo() {
-    if (!logoShowing || !logoCtx) return;
+    if (!logoShowing || !logoCtx || !logoImage) return;
 
     logoCtx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
     logoCtx.save();
     logoCtx.globalAlpha = logoAlpha;
 
-    // Draw a large firework emoji in center
-    logoCtx.font = '200px Arial';
-    logoCtx.textAlign = 'center';
-    logoCtx.textBaseline = 'middle';
+    // Calculate scale animation
+    const elapsed = Date.now() - logoStartTime;
+    const scale = Math.min(1, 0.3 + (elapsed / 400) * 0.7);
+
+    // Center and scale
+    const centerX = logoCanvas.width / 2;
+    const centerY = logoCanvas.height / 2;
+
+    logoCtx.translate(centerX, centerY);
+    logoCtx.scale(scale, scale);
+    logoCtx.translate(-centerX, -centerY);
+
+    // Draw Forward Networks logo
+    const logoWidth = 340;
+    const logoHeight = 44;
+    const x = (logoCanvas.width - logoWidth) / 2;
+    const y = (logoCanvas.height - logoHeight) / 2;
 
     // Add glow effect
-    logoCtx.shadowColor = '#ffd700';
-    logoCtx.shadowBlur = 30;
-    logoCtx.fillText('🎆', 150, 150);
+    logoCtx.shadowColor = '#ff3506';
+    logoCtx.shadowBlur = 25;
 
-    // Add text below
-    logoCtx.shadowBlur = 10;
-    logoCtx.font = 'bold 24px Arial';
-    logoCtx.fillStyle = '#ffffff';
-    logoCtx.fillText('FIREWORKS!', 150, 240);
+    // Draw the logo
+    logoCtx.drawImage(logoImage, x, y, logoWidth, logoHeight);
 
     logoCtx.restore();
   }
+
+  let logoStartTime = 0;
 
   // Fade out logo
   function updateLogo() {
@@ -564,4 +598,9 @@
 
   // Initialize
   setupClickHandler();
+
+  // Preload logo image
+  loadLogoImage().catch(() => {
+    console.log('Logo preloading failed, will use fallback');
+  });
 })();
