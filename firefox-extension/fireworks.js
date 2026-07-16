@@ -395,14 +395,22 @@
   function isTargetButton(event, settings) {
     // Default mode: detect all button-like elements
     if (settings.buttonSelectorMode === 'default') {
-      return event.target.closest('button, [role="button"], input[type="button"], input[type="submit"]');
+      const target = event.target.closest('button, [role="button"], input[type="button"], input[type="submit"]');
+      if (target) {
+        console.log('🎆 Button detected (default mode):', target.tagName, target.className);
+      }
+      return target;
     }
 
     // Custom mode: use specific selector
     if (settings.buttonSelectorMode === 'custom' && settings.buttonSelector) {
       try {
         // Check if clicked element or its parent matches the selector
-        return event.target.closest(settings.buttonSelector);
+        const target = event.target.closest(settings.buttonSelector);
+        if (target) {
+          console.log('🎆 Button detected (custom selector):', settings.buttonSelector);
+        }
+        return target;
       } catch (error) {
         console.error('Invalid button selector:', error);
         return false;
@@ -414,10 +422,15 @@
 
   // Main click handler
   function handleClick(event) {
-    if (!currentSettings) return;
+    if (!currentSettings) {
+      console.log('⚠️ No settings loaded');
+      return;
+    }
 
     // Check URL first
     if (!shouldActivate(currentSettings)) {
+      console.log('🚫 URL not activated for:', window.location.href);
+      console.log('   Mode:', currentSettings.mode, 'URLs:', currentSettings.urls);
       return;
     }
 
@@ -427,6 +440,7 @@
       if (audioContext && audioContext.state === 'suspended') {
         audioContext.resume();
       }
+      console.log('🎆 FIREWORKS ACTIVATED!');
       createFireworks(event.clientX, event.clientY);
     }
   }
@@ -434,15 +448,20 @@
   // Setup click listener
   function setupClickHandler() {
     loadSettings().then(settings => {
+      currentSettings = settings;
+      console.log('🎆 Button Fireworks Settings Loaded:');
+      console.log('   URL mode:', settings.mode);
+      console.log('   Whitelist URLs:', settings.urls);
+      console.log('   Button selector mode:', settings.buttonSelectorMode);
+      console.log('   Custom selector:', settings.buttonSelector);
+      console.log('   Current URL:', window.location.href);
+
       if (shouldActivate(settings)) {
         document.addEventListener('click', handleClick, true); // Use capture phase
-        console.log('Button Fireworks activated for:', window.location.href);
-        console.log('Button selector mode:', settings.buttonSelectorMode);
-        if (settings.buttonSelectorMode === 'custom') {
-          console.log('Custom selector:', settings.buttonSelector);
-        }
+        console.log('✅ Button Fireworks ACTIVATED for this page');
+        console.log('   Click any button to test');
       } else {
-        console.log('Button Fireworks: URL not in whitelist:', window.location.href);
+        console.log('❌ Button Fireworks NOT activated - URL not in whitelist');
       }
     });
   }
