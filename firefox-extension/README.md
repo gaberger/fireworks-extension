@@ -33,7 +33,7 @@ A fun Firefox extension that displays colorful fireworks animation on web pages 
 2. **Load the Extension**
    - Click the "Load Temporary Add-on..." button (usually a folder icon)
    - A file picker dialog will appear
-   - Navigate to: `/Users/gb/Working/fireworks/firefox-extension/`
+   - Navigate to the extension folder
    - Select the `manifest.json` file
    - Click "Open"
 
@@ -52,11 +52,11 @@ A fun Firefox extension that displays colorful fireworks animation on web pages 
    - Open a terminal
    - Navigate to the extension directory:
      ```bash
-     cd /Users/gb/Working/fireworks/firefox-extension
+     cd /path/to/fireworks-extension
      ```
    - Create a zip file:
      ```bash
-     zip -r button-fireworks.zip * -x "*.DS_Store" "*.git*"
+     zip -r fireworks-extension.zip * -x "*.DS_Store" "*.git*"
      ```
 
 2. **Install the Package**
@@ -65,7 +65,7 @@ A fun Firefox extension that displays colorful fireworks animation on web pages 
    - Click the gear icon (⚙️) in the top-right corner
    - Select "Install Add-on From File..."
    - Navigate to the zip file you created
-   - Select `button-fireworks.zip`
+   - Select `fireworks-extension.zip`
    - Click "Add"
 
 3. **Verify Installation**
@@ -90,7 +90,7 @@ If you're in the extension directory:
 # Just navigate to about:debugging and select manifest.json
 
 # For permanent installation
-zip -r button-fireworks.zip * -x "*.DS_Store" "*.git*"
+zip -r fireworks-extension.zip * -x "*.DS_Store" "*.git*"
 ```
 
 ### After Installation
