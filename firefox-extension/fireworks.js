@@ -2,6 +2,7 @@
  * Button Fireworks - Content Script
  * Displays fireworks when buttons are clicked on web pages
  * Supports URL and button selector configuration
+ * Cross-browser compatible (Chrome/Firefox)
  */
 
 (function() {
@@ -17,11 +18,15 @@
   let logoAlpha = 0;
   let logoShowing = false;
   let logoImage = null;
+  let logoStartTime = 0;
 
-  // Forward Networks SVG logo
-  const logoSvgData = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNzAgMjIiPgogICAgPHBhdGggZmlsbD0iI2ZmMzUwNiIgZD0iTTE1MC44ODkgMmgtMTYuOTV2NC4wNTdoMTMuMTE5TDEzMS4wNjkgMjFoNS43NTNsMTMuMDk3LTEzLjA1OXYyMWgtOC42MDlWNi4wOWMwLTEuNzA2LTEuMzkzLTMuMDktMy4wOTktMy4wOSIvPgogICAgPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTYxLjQzIDMuNjY4Yy0uODYtLjg3OS0xLjg4Mi0xLjU1Ny0zLjA1OC0yLjAzOXMtMi40Ni0uNzIxLTMuODUtLjcyMS0yLjY3My4yMzktMy44NS43MjFjLTEuMTc2LjQ4Mi0yLjIwMyAxLjE2LTMuMDcxIDIuMDM5LS44NzMuODc5LTEuNTQ4IDEuOTMyLTIuMDMyIDMuMTYtLjQ4MyAxLjIyOC0uNzIzIDIuNTg1LS43MjMgNC4wNnYuMTk2YzAgMS40OTcuMjQgMi44NjIuNzIzIDQuMDlzMS4xNTkgMi4yODIgMi4wMzIgMy4xNmMuODczLjg3OSAxLjg5NSAxLjU1NyAzLjA3MSAyLjAzOXMyLjQ2LjcyMSAzLjg1LjcyMSAyLjY3My0uMjM5IDMuODUtLjcyMWMxLjE3Ni0uNDgyIDIuMTk0LTEuMTYgMy4wNTgtMi4wMzlzMS41MzYtMS45MzIgMi4wMTUtMy4xNmMuNDgzLTEuMjI4LjcyMy0yLjU5My43MjMtNC4wOXYtLjE5NmMwLTEuNDgtLjI0LTIuODMyLS43MjMtNC4wNi0uNDc5LTEuMjI4LTEuMTUxLTIuMjgyLTIuMDE1LTMuMTZtLTEuMjkyIDcuNDE3YzAgMS4yOTItLjI0IDIuNDAxLS43MjMgMy4zMjctLjQ4My45MjUtMS4xNDYgMS42MjktMS45ODkgMi4xMnMtMS44MTQuNzM0LTIuOTA0LjczNC0yLjA2Ni0uMjQzLTIuOTE3LS43MzRjLS44NTEtLjQ5LTEuNTE4LTEuMTk4LTIuMDAyLTIuMTItLjQ4My0uOTI2LS43MjMtMi4wMzQtLjcyMy0zLjMyN3YtLjE5NmMwLTEuMjc1LjI0LTIuMzc2LjcyMy0zLjMwMS40ODMtLjkyNiAxLjE1MS0xLjYyOSAyLjAwMi0yLjEyLjg1MS0uNDkgMS44MjYtLjczNCAyLjkxNy0uNzM0czIuMDYyLjI0NyAyLjkwNC43MzRjLjg0My40OSAxLjUwNiAxLjE5OCAxLjk4OSAyLjEyLjQ4My45MjYuNzIzIDIuMDI2LjcyMyAzLjMwMXptMjIuNDgzIDIuMDg2YzEuMDcxLS40OTcgMS45LTEuMjIyIDIuNDk1LTIuMTg1LjU5MS0uOTYzLjg4Ni0yLjE0OS44ODYtMy41NTZzLS4yOTUtMi41NjMtLjg4Ni0zLjUxNmMtLjU5MS0uOTU0LTEuNDI0LTEuNjc1LTIuNDk1LTIuMTcxQzU3LjU3MiAxLjI0NiA1Ni4zMjQgMSA1NC44OTIgMUg0NnYyMGg0LjA2OXYtNy4wODZoNC4xNDhMNThLjAxMyAyMWg0LjYxNmwtNC4zMi03LjY5N2MuMTA2LS4wNDQuMjI1LS4wODQuMzM1LS4xMzJabS04LjU3NC04Ljc2OWg0LjYyYy45NTcgMCAxLjcyNC4yODYgMi4zMDYuODU3cS44NzMuODU2NS44NzMgMi4yMjljMCAxLjM3MjUtLjI5MSAxLjcwMS0uODczIDIuMjQyLS41ODIuNTQ1LTEuMzUzLjgxMy0yLjMwNi44MTNoLTQuNjJ6bTM3Ljg1NiAxMC41MjNMODMuNzU5IDFoLTQuNDk3TDc1LjA3IDE0LjkzNCA3MS41MjYgMUg2Ny40bDUuNTI4IDIwaDQuMjE0bDQuMzU1LTE1LjAyOUw4NS44NzkgMjFoNC4xNTdsNS41NTktMjBoLTQuMTI2ek01LjA0MiA0LjY1N2gxMC40OTJWMUgxdjIwaDQuMDQydi03LjQ1NWg5LjgwNFY5Ljk0MUg1LjA0Mm0xMzYuNjAxIDguNTE0YzEuMDcxLS40OTcgMS45LTEuMjIyIDIuNDkxLTIuMTg1cy44OS0yLjE0OS44OS0zLjU1Ni0uMjk1LTIuNTYzLS44OS0zLjUxNmMtLjg4OS0xLjA3Ni0xLjg2LTEuODUzLTIuNDkxLTIuMTcxLTEuMDcxLS40OTctMi4zMjMtLjc0My0zLjc1Ni0uNzQzSDEyOXYyMGg0LjA2OXYtNy4wODZoNC4xNDhMMTQxLjAxMyAyMWg0LjYxbC00LjMyLTcuNjk3Yy4xMTEtLjA0NC4yMy0uMDc5LjM0LS4xMzJtLTguNTc0LTguNzY5aDQuNjE2Yy45NTcgMCAxLjcyNC4yODYgMi4zMDUuODU3LjU4My41NzEuODc0IDEuMzE0Ljg3NCAyLjIyOXMtLjI5MSAxLjcwMS0uODc0IDIuMjQyYy0uNTgyLjU0NS0xLjM1My44MTMtMi4zMDUuODEzaC00LjYxNnptMzUuMDkyIDIuNDUzYy0uNTA2LTEuMi0xLjIwOC0yLjIzNy0yLjEwNy0zLjExMnMtMS45NTctMS41NTItMy4xNzktMi4wMzFDMTU4LjY1NSAxLjIzNyAxNTUuMzIzIDEgMTUyLjg5IDFIMTQ2djIwaDcuODljMS40MTUgMCAyLjczLS4yMzcgMy45NDItLjcxMnMyMi4yNzUtMS4xNTYgMy4xODItMi4wNDRjLjkwOC0uODg4IDEuNjE5LTEuOTMgMi4xMzUtMy4xM3MuNzcxLTIuNTMyLjc3MS00di0uMjg2Yy4wMDQtMS40NTEtLjI1MS0yLjc3NC0uNzU5LTMuOTc0Wm0tMy4zOTQgNC4yNTVjMCAxLjIxOC0uMjY1IDIuMjg2LS43ODkgMy4ycy0xLjI1NyAxLjYzMS0yLjE5MSAyLjE0NWMtLjkzNS41MTQtMi4wMDYuNzY5LTMuMjA5Ljc2OWgtMy41MDlWNC43NjdoMy41MDljMS4yNDQgMCAyLjMyOS4yNTUgMy4yNTQuNzU2LjkyNi41MDUgMS42NDkgMS4yMDkgMi4xNjUgMi4xMTRzLjc3MSAxLjk2NS43NzEgMy4xODd2LjI4NloiLz4KPC9zdmc+`;
+  // Forward Networks SVG logo (inline)
+  const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 22" width="340" height="44">
+    <path fill="#ff3506" d="M118.901 1h-16.95v4.057h13.119L99.081 21h5.753l13.097-13.059V21H122V4.09c0-1.706-1.393-3.09-3.099-3.09"/>
+    <path fill="#ffffff" d="M37.452 3.668c-.86-.879-1.882-1.557-3.058-2.039s-2.46-.721-3.85-.721-2.673.239-3.85.721c-1.176.482-2.203 1.16-3.071 2.039-.873.879-1.548 1.932-2.032 3.16-.483 1.228-.723 2.585-.723 4.06v.196c0 1.497.24 2.862.723 4.09s1.159 2.282 2.032 3.16c.873.879 1.895 1.557 3.071 2.039s2.46.721 3.85.721 2.673-.239 3.85-.721c1.176-.482 2.194-1.16 3.058-2.039s1.536-1.932 2.015-3.16c.483-1.228.723-2.593.723-4.09v-.196c0-1.48-.24-2.832-.723-4.06-.479-1.228-1.151-2.282-2.015-3.16m-1.292 7.417c0 1.292-.24 2.401-.723 3.327-.483.925-1.146 1.629-1.989 2.12s-1.814.734-2.904.734-2.066-.243-2.917-.734c-.851-.49-1.518-1.198-2.002-2.12-.483-.926-.723-2.034-.723-3.327v-.196c0-1.275.24-2.376.723-3.301.483-.926 1.151-1.629 2.002-2.12.851-.49 1.826-.734 2.917-.734s2.062.247 2.904.734c.843.49 1.506 1.198 1.989 2.12.483.926.723 2.026.723 3.301zm22.483 2.086c1.071-.497 1.9-1.222 2.495-2.185.591-.963.886-2.149.886-3.556s-.295-2.563-.886-3.516c-.591-.954-1.424-1.675-2.495-2.171C57.572 1.246 56.324 1 54.892 1H46v20h4.069v-7.086h4.148L58.013 21h4.616l-4.32-7.697c.106-.044.225-.084.335-.132Zm-8.574-8.769h4.62c.957 0 1.724.286 2.306.857q.873.8565.873 2.229c0 1.3725-.291 1.701-.873 2.242-.582.545-1.353.813-2.306.813h-4.62zm37.856 10.523L83.759 1h-4.497L75.07 14.934 71.526 1H67.4l5.528 20h4.214l4.355-15.029L85.879 21h4.157l5.559-20h-4.126zM5.042 4.657h10.492V1H1v20h4.042v-7.455h9.804V9.941H5.042zm136.601 8.514c1.071-.497 1.9-1.222 2.491-2.185s.89-2.149.89-3.556-.295-2.563-.89-3.516c-.889-1.076-1.86-1.853-2.491-2.171-1.071-.497-2.323-.743-3.756-.743H129v20h4.069v-7.086h4.148L141.013 21h4.61l-4.32-7.697c.111-.044.23-.079.34-.132m-8.574-8.769h4.616c.957 0 1.724.286 2.305.857.583.571.874 1.314.874 2.229s-.291 1.701-.874 2.242c-.582.545-1.353.813-2.305.813h-4.616zm35.092 2.453c-.506-1.2-1.208-2.237-2.107-3.112s-1.957-1.552-3.179-2.031C161.654 1.237 160.323 1 158.89 1H151v20h7.89c1.415 0 2.73-.237 3.942-.712s2.275-1.156 3.182-2.044c.908-.888 1.619-1.93 2.135-3.13s.771-2.532.771-4v-.286c.004-1.451-.251-2.774-.759-3.974Zm-3.394 4.255c0 1.218-.265 2.286-.789 3.2s-1.257 1.631-2.191 2.145c-.935.514-2.006.769-3.209.769h-3.509V4.767h3.509c1.244 0 2.329.255 3.254.756.926.505 1.649 1.209 2.165 2.114s.771 1.965.771 3.187v.286Z"/>
+</svg>`;
 
-  // Load logo image
+  // Load logo image using Blob
   function loadLogoImage() {
     return new Promise((resolve, reject) => {
       if (logoImage) {
@@ -33,88 +38,27 @@
       img.onload = () => {
         logoImage = img;
         console.log('✅ Logo loaded successfully');
+        URL.revokeObjectURL(url);
         resolve(img);
       };
       img.onerror = (e) => {
         console.error('❌ Logo failed to load:', e);
         reject(e);
       };
-      console.log('📥 Loading logo from data URL...');
-      img.src = logoSvgData;
+
+      const svgBlob = new Blob([logoSvg], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      console.log('📥 Loading logo from SVG Blob...');
+      img.src = url;
     });
-  }
-
-  // Initialize audio context for sound effects
-  function initAudio() {
-    if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    return audioContext;
-  }
-
-  // Play a pop sound using Web Audio API
-  function playPopSound() {
-    try {
-      const ctx = initAudio();
-
-      // Resume if suspended (browser autoplay policy)
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
-
-      console.log('Playing pop sound, context state:', ctx.state);
-
-      // Create oscillator for the main pop
-      const oscillator = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(ctx.destination);
-
-      // Set up the pop sound characteristics
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(400 + Math.random() * 200, ctx.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.15);
-
-      // Envelope for a quick pop - INCREASED VOLUME
-      gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-
-      oscillator.start(ctx.currentTime);
-      oscillator.stop(ctx.currentTime + 0.15);
-
-      // Add a crackle for realism
-      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
-      const noiseData = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < noiseData.length; i++) {
-        noiseData[i] = (Math.random() * 2 - 1) * 0.15;
-      }
-
-      const noiseSource = ctx.createBufferSource();
-      const noiseGain = ctx.createGain();
-
-      noiseSource.buffer = noiseBuffer;
-      noiseSource.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
-
-      noiseGain.gain.setValueAtTime(0.3, ctx.currentTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
-
-      noiseSource.start(ctx.currentTime);
-      noiseSource.stop(ctx.currentTime + 0.05);
-
-    } catch (error) {
-      // Audio might not be available or not yet initialized
-      console.error('Audio error:', error);
-    }
   }
 
   // Default settings
   const defaultSettings = {
-    mode: 'all',              // 'all' or 'whitelist'
-    urls: [],                 // Array of URL patterns
-    buttonSelector: '',       // Specific CSS selector for buttons
-    buttonSelectorMode: 'default'  // 'default' (auto-detect) or 'custom' (use selector)
+    mode: 'all',
+    urls: [],
+    buttonSelector: '',
+    buttonSelectorMode: 'default'
   };
 
   // Load settings from storage
@@ -135,9 +79,7 @@
       return true;
     }
 
-    // Whitelist mode - check if current URL matches any pattern
     const currentUrl = window.location.href;
-
     return settings.urls.some(pattern => {
       return matchUrlPattern(currentUrl, pattern);
     });
@@ -145,7 +87,6 @@
 
   // Match URL against pattern (supports * wildcard)
   function matchUrlPattern(url, pattern) {
-    // Escape special regex characters except *
     const regexPattern = pattern
       .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
       .replace(/\*/g, '.*');
@@ -155,6 +96,64 @@
       return regex.test(url);
     } catch (error) {
       return false;
+    }
+  }
+
+  // Initialize audio context for sound effects
+  function initAudio() {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioContext;
+  }
+
+  // Play a pop sound using Web Audio API
+  function playPopSound() {
+    try {
+      const ctx = initAudio();
+
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+
+      console.log('Playing pop sound, context state:', ctx.state);
+
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(400 + Math.random() * 200, ctx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.15);
+
+      gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + 0.15);
+
+      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+      const noiseData = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < noiseData.length; i++) {
+        noiseData[i] = (Math.random() * 2 - 1) * 0.15;
+      }
+
+      const noiseSource = ctx.createBufferSource();
+      const noiseGain = ctx.createGain();
+
+      noiseSource.buffer = noiseBuffer;
+      noiseSource.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+
+      noiseGain.gain.setValueAtTime(0.3, ctx.currentTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+
+      noiseSource.start(ctx.currentTime);
+      noiseSource.stop(ctx.currentTime + 0.05);
+    } catch (error) {
+      console.error('Audio error:', error);
     }
   }
 
@@ -199,14 +198,14 @@
       const velocity = (Math.random() * 6 + 2) * velocityMultiplier;
       this.vx = Math.cos(angle) * velocity;
       this.vy = Math.sin(angle) * velocity;
-      this.gravity = 0.08; // Slower gravity for longer effect
-      this.friction = 0.985; // Less friction for longer travel
+      this.gravity = 0.08;
+      this.friction = 0.985;
       this.alpha = 1;
-      this.decay = Math.random() * 0.003 + 0.005; // Lasts ~1000ms
+      this.decay = Math.random() * 0.003 + 0.005;
       this.size = (Math.random() * 3 + 1) * sizeMultiplier;
-      this.hasSparkle = Math.random() < 0.2; // 20% chance to sparkle
+      this.hasSparkle = Math.random() < 0.2;
       this.rotation = Math.random() * Math.PI * 2;
-      this.rotationSpeed = (Math.random() - 0.5) * 0.15; // Slower rotation
+      this.rotationSpeed = (Math.random() - 0.5) * 0.15;
     }
 
     randomShape() {
@@ -272,7 +271,7 @@
         case 'square':
           context.fillRect(-s, -s, s * 2, s * 2);
           break;
-        default: // circle
+        default:
           context.beginPath();
           context.arc(0, 0, s, 0, Math.PI * 2);
           context.fill();
@@ -321,80 +320,59 @@
     }
   }
 
-  // Create a burst of fireworks at the specified coordinates
+  // Create fireworks bursts
   function createFireworks(x, y) {
     initCanvas();
 
     const colors = [
-      // Reds and Pinks
       '#ff6b6b', '#ff7675', '#fd79a8', '#e84393', '#d63031',
       '#c0392b', '#e55039', '#eb4d4b', '#ff4757', '#ff7f50',
-
-      // Oranges and Yellows
       '#feca57', '#fdcb6e', '#f1c40f', '#f39c12', '#e17055',
       '#ff9f43', '#ee5a24', '#d35400', '#e67e22', '#f39c12',
-
-      // Greens and Teals
       '#48dbfb', '#74b9ff', '#00cec9', '#10ac84', '#00b894',
       '#55efc4', '#00d2d3', '#16a085', '#1abc9c', '#2ecc71',
-
-      // Blues and Purples
       '#54a0ff', '#5f27cd', '#6c5ce7', '#a29bfe', '#0984e3',
       '#3498db', '#2980b9', '#8e44ad', '#9b59b6', '#6c5ce7',
-
-      // Special colors
       '#ffd700', '#c0c0c0', '#ffffff', '#7fff00', '#ff00ff',
       '#00ffff', '#ff1493', '#00ff00', '#ff6347', '#20b2aa'
     ];
 
-    // Create more varied bursts across the entire screen
-    const burstCount = 30;  // More bursts (doubled)
+    const burstCount = 30;
+    const shapes = ['circle', 'star', 'diamond', 'triangle', 'heart', 'square'];
 
-    // Show logo in center
     showLogo();
 
     for (let burst = 0; burst < burstCount; burst++) {
-      // Random position across the screen
       const burstX = Math.random() * window.innerWidth;
       const burstY = Math.random() * window.innerHeight;
+      const dominantShape = shapes[Math.floor(Math.random() * shapes.length)];
 
-      // Variety: each burst has different characteristics
       const variety = Math.random();
 
-      let particleCount = 60;  // More particles (increased from 40)
+      let particleCount = 60;
       let velocityMultiplier = 1;
       let sizeMultiplier = 1;
 
-      // Dominant shape for this burst (70% use this shape, 30% random)
-      const shapes = ['circle', 'star', 'diamond', 'triangle', 'heart', 'square'];
-      const dominantShape = shapes[Math.floor(Math.random() * shapes.length)];
-
       if (variety < 0.25) {
-        // Big explosion
-        particleCount = 120;  // Increased from 80
+        particleCount = 120;
         velocityMultiplier = 1.5;
         sizeMultiplier = 1.5;
       } else if (variety < 0.5) {
-        // Small burst
-        particleCount = 40;  // Increased from 25
+        particleCount = 40;
         velocityMultiplier = 0.7;
         sizeMultiplier = 0.7;
       } else if (variety < 0.75) {
-        // Fast burst
-        particleCount = 80;  // Increased from 50
+        particleCount = 80;
         velocityMultiplier = 2;
         sizeMultiplier = 0.8;
       }
 
-      // Play pop sound with slight delay
       setTimeout(() => {
         playPopSound();
-      }, burst * 25);  // Faster sound timing
+      }, burst * 25);
 
-      // Create burst particles with variety
       for (let i = 0; i < particleCount; i++) {
         const color = colors[Math.floor(Math.random() * colors.length)];
-        // 70% use dominant shape, 30% random
         const shape = Math.random() < 0.7 ? dominantShape : null;
         particles.push(new Particle(burstX, burstY, color, velocityMultiplier, sizeMultiplier, shape));
       }
@@ -442,13 +420,9 @@
     logoCtx.save();
     logoCtx.globalAlpha = logoAlpha;
 
-    console.log('Drawing logo, alpha:', logoAlpha, 'image loaded:', !!logoImage);
-
-    // Calculate scale animation
     const elapsed = Date.now() - logoStartTime;
     const scale = Math.min(1, 0.3 + (elapsed / 400) * 0.7);
 
-    // Center and scale
     const centerX = logoCanvas.width / 2;
     const centerY = logoCanvas.height / 2;
 
@@ -457,19 +431,16 @@
     logoCtx.translate(-centerX, -centerY);
 
     if (logoImage) {
-      // Draw Forward Networks logo
       const logoWidth = 340;
       const logoHeight = 44;
       const x = (logoCanvas.width - logoWidth) / 2;
       const y = (logoCanvas.height - logoHeight) / 2;
 
-      // Add glow effect
       logoCtx.shadowColor = '#ff3506';
       logoCtx.shadowBlur = 25;
 
       logoCtx.drawImage(logoImage, x, y, logoWidth, logoHeight);
     } else {
-      // Fallback: draw text
       logoCtx.fillStyle = '#ff3506';
       logoCtx.font = 'bold 32px Arial';
       logoCtx.textAlign = 'center';
@@ -480,13 +451,11 @@
     logoCtx.restore();
   }
 
-  let logoStartTime = 0;
-
   // Fade out logo
   function updateLogo() {
     if (!logoShowing) return;
 
-    logoAlpha -= 0.008;  // Fade out over ~2 seconds
+    logoAlpha -= 0.008;
 
     if (logoAlpha <= 0) {
       logoShowing = false;
@@ -506,7 +475,6 @@
       return;
     }
 
-    // Use clearRect for full transparency (no dark background)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     particles = particles.filter(particle => {
@@ -515,7 +483,6 @@
       return !particle.isDead();
     });
 
-    // Update and draw logo
     updateLogo();
     drawLogo();
 
@@ -524,7 +491,6 @@
 
   // Check if clicked element matches the configured button
   function isTargetButton(event, settings) {
-    // Default mode: detect all button-like elements
     if (settings.buttonSelectorMode === 'default') {
       const target = event.target.closest('button, [role="button"], input[type="button"], input[type="submit"]');
       if (target) {
@@ -533,10 +499,8 @@
       return target;
     }
 
-    // Custom mode: use specific selector
     if (settings.buttonSelectorMode === 'custom' && settings.buttonSelector) {
       try {
-        // Check if clicked element or its parent matches the selector
         const target = event.target.closest(settings.buttonSelector);
         if (target) {
           console.log('🎆 Button detected (custom selector):', settings.buttonSelector);
@@ -558,16 +522,13 @@
       return;
     }
 
-    // Check URL first
     if (!shouldActivate(currentSettings)) {
       console.log('🚫 URL not activated for:', window.location.href);
       console.log('   Mode:', currentSettings.mode, 'URLs:', currentSettings.urls);
       return;
     }
 
-    // Check button
     if (isTargetButton(event, currentSettings)) {
-      // Resume audio context if suspended (browser autoplay policy)
       if (audioContext && audioContext.state === 'suspended') {
         audioContext.resume();
       }
@@ -588,7 +549,7 @@
       console.log('   Current URL:', window.location.href);
 
       if (shouldActivate(settings)) {
-        document.addEventListener('click', handleClick, true); // Use capture phase
+        document.addEventListener('click', handleClick, true);
         console.log('✅ Button Fireworks ACTIVATED for this page');
         console.log('   Click any button to test');
       } else {
@@ -600,7 +561,6 @@
   // Listen for settings changes
   chrome.runtime.onMessage.addListener((message) => {
     if (message.action === 'reloadSettings') {
-      // Remove old listener and re-setup
       document.removeEventListener('click', handleClick, true);
       setupClickHandler();
     }
