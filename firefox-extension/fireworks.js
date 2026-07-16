@@ -93,7 +93,7 @@
   // Load settings from storage
   async function loadSettings() {
     try {
-      const result = await browser.storage.local.get('fireworksSettings');
+      const result = await chrome.storage.local.get('fireworksSettings');
       currentSettings = result.fireworksSettings || { ...defaultSettings };
     } catch (error) {
       console.error('Failed to load settings:', error);
@@ -544,7 +544,7 @@
   }
 
   // Listen for settings changes
-  browser.runtime.onMessage.addListener((message) => {
+  chrome.runtime.onMessage.addListener((message) => {
     if (message.action === 'reloadSettings') {
       // Remove old listener and re-setup
       document.removeEventListener('click', handleClick, true);

@@ -46,7 +46,7 @@
   // Load settings from storage
   async function loadSettings() {
     try {
-      const result = await browser.storage.local.get('fireworksSettings');
+      const result = await chrome.storage.local.get('fireworksSettings');
       settings = result.fireworksSettings || { ...defaultSettings };
     } catch (error) {
       console.error('Failed to load settings:', error);
@@ -57,14 +57,14 @@
   // Save settings to storage
   async function saveSettings() {
     try {
-      await browser.storage.local.set({ fireworksSettings: settings });
+      await chrome.storage.local.set({ fireworksSettings: settings });
       showStatus('Settings saved successfully!', 'success');
 
       // Notify content scripts to reload
-      const tabs = await browser.tabs.query({});
+      const tabs = await chrome.tabs.query({});
       for (const tab of tabs) {
         try {
-          await browser.tabs.sendMessage(tab.id, { action: 'reloadSettings' });
+          await chrome.tabs.sendMessage(tab.id, { action: 'reloadSettings' });
         } catch (e) {
           // Tab might not have content script loaded, ignore
         }
