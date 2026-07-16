@@ -151,10 +151,11 @@
 
   // Particle class for fireworks
   class Particle {
-    constructor(x, y, color, velocityMultiplier = 1, sizeMultiplier = 1) {
+    constructor(x, y, color, velocityMultiplier = 1, sizeMultiplier = 1, shape = 'circle') {
       this.x = x;
       this.y = y;
       this.color = color;
+      this.shape = shape || this.randomShape();
       const angle = Math.random() * Math.PI * 2;
       const velocity = (Math.random() * 6 + 2) * velocityMultiplier;
       this.vx = Math.cos(angle) * velocity;
@@ -165,6 +166,13 @@
       this.decay = Math.random() * 0.02 + 0.01;
       this.size = (Math.random() * 3 + 1) * sizeMultiplier;
       this.hasSparkle = Math.random() < 0.15; // 15% chance to sparkle
+      this.rotation = Math.random() * Math.PI * 2;
+      this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+    }
+
+    randomShape() {
+      const shapes = ['circle', 'star', 'diamond', 'triangle', 'heart', 'square'];
+      return shapes[Math.floor(Math.random() * shapes.length)];
     }
 
     update() {
@@ -174,14 +182,16 @@
       this.x += this.vx;
       this.y += this.vy;
       this.alpha -= this.decay;
+      this.rotation += this.rotationSpeed;
     }
 
     draw(context) {
       context.save();
       context.globalAlpha = this.alpha;
+      context.translate(this.x, this.y);
+      context.rotate(this.rotation);
 
       if (this.hasSparkle) {
-        // Sparkle effect - alternating brightness
         context.fillStyle = Math.random() > 0.5 ? '#ffffff' : this.color;
         context.shadowColor = this.color;
         context.shadowBlur = 10;
@@ -189,10 +199,82 @@
         context.fillStyle = this.color;
       }
 
-      context.beginPath();
-      context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      context.fill();
+      this.drawShape(context);
       context.restore();
+    }
+
+    drawShape(context) {
+      const s = this.size;
+
+      switch (this.shape) {
+        case 'star':
+          this.drawStar(context, 0, 0, 5, s, s / 2);
+          break;
+        case 'diamond':
+          context.beginPath();
+          context.moveTo(0, -s);
+          context.lineTo(s * 0.6, 0);
+          context.lineTo(0, s);
+          context.lineTo(-s * 0.6, 0);
+          context.closePath();
+          context.fill();
+          break;
+        case 'triangle':
+          context.beginPath();
+          context.moveTo(0, -s);
+          context.lineTo(s * 0.866, s * 0.5);
+          context.lineTo(-s * 0.866, s * 0.5);
+          context.closePath();
+          context.fill();
+          break;
+        case 'heart':
+          this.drawHeart(context, 0, 0, s);
+          break;
+        case 'square':
+          context.fillRect(-s, -s, s * 2, s * 2);
+          break;
+        default: // circle
+          context.beginPath();
+          context.arc(0, 0, s, 0, Math.PI * 2);
+          context.fill();
+      }
+    }
+
+    drawStar(context, cx, cy, spikes, outerRadius, innerRadius) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      const step = Math.PI / spikes;
+
+      context.beginPath();
+      context.moveTo(cx, cy - outerRadius);
+
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        context.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        context.lineTo(x, y);
+        rot += step;
+      }
+
+      context.lineTo(cx, cy - outerRadius);
+      context.closePath();
+      context.fill();
+    }
+
+    drawHeart(context, x, y, size) {
+      const s = size * 0.8;
+      context.beginPath();
+      context.moveTo(x, y + s * 0.3);
+      context.bezierCurveTo(x, y - s * 0.5, x - s, y - s * 0.5, x - s, y + s * 0.2);
+      context.bezierCurveTo(x - s, y + s * 0.7, x, y + s, x, y + s);
+      context.bezierCurveTo(x, y + s, x + s, y + s * 0.7, x + s, y + s * 0.2);
+      context.bezierCurveTo(x + s, y - s * 0.5, x, y - s * 0.5, x, y + s * 0.3);
+      context.fill();
     }
 
     isDead() {
@@ -205,10 +287,25 @@
     initCanvas();
 
     const colors = [
-      '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff',
-      '#5f27cd', '#00d2d3', '#ff9f43', '#10ac84', '#ee5a24',
-      '#ff7675', '#fd79a8', '#a29bfe', '#74b9ff', '#00cec9',
-      '#fdcb6e', '#e17055', '#d63031', '#6c5ce7', '#0984e3'
+      // Reds and Pinks
+      '#ff6b6b', '#ff7675', '#fd79a8', '#e84393', '#d63031',
+      '#c0392b', '#e55039', '#eb4d4b', '#ff4757', '#ff7f50',
+
+      // Oranges and Yellows
+      '#feca57', '#fdcb6e', '#f1c40f', '#f39c12', '#e17055',
+      '#ff9f43', '#ee5a24', '#d35400', '#e67e22', '#f39c12',
+
+      // Greens and Teals
+      '#48dbfb', '#74b9ff', '#00cec9', '#10ac84', '#00b894',
+      '#55efc4', '#00d2d3', '#16a085', '#1abc9c', '#2ecc71',
+
+      // Blues and Purples
+      '#54a0ff', '#5f27cd', '#6c5ce7', '#a29bfe', '#0984e3',
+      '#3498db', '#2980b9', '#8e44ad', '#9b59b6', '#6c5ce7',
+
+      // Special colors
+      '#ffd700', '#c0c0c0', '#ffffff', '#7fff00', '#ff00ff',
+      '#00ffff', '#ff1493', '#00ff00', '#ff6347', '#20b2aa'
     ];
 
     // Create more varied bursts across the entire screen
@@ -225,6 +322,10 @@
       let particleCount = 40;
       let velocityMultiplier = 1;
       let sizeMultiplier = 1;
+
+      // Dominant shape for this burst (70% use this shape, 30% random)
+      const shapes = ['circle', 'star', 'diamond', 'triangle', 'heart', 'square'];
+      const dominantShape = shapes[Math.floor(Math.random() * shapes.length)];
 
       if (variety < 0.25) {
         // Big explosion
@@ -251,7 +352,9 @@
       // Create burst particles with variety
       for (let i = 0; i < particleCount; i++) {
         const color = colors[Math.floor(Math.random() * colors.length)];
-        particles.push(new Particle(burstX, burstY, color, velocityMultiplier, sizeMultiplier));
+        // 70% use dominant shape, 30% random
+        const shape = Math.random() < 0.7 ? dominantShape : null;
+        particles.push(new Particle(burstX, burstY, color, velocityMultiplier, sizeMultiplier, shape));
       }
     }
 

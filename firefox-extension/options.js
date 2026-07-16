@@ -261,20 +261,32 @@
 
     const particles = [];
     const colors = [
-      '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff',
-      '#5f27cd', '#00d2d3', '#ff9f43', '#10ac84', '#ee5a24',
-      '#ff7675', '#fd79a8', '#a29bfe', '#74b9ff', '#00cec9',
-      '#fdcb6e', '#e17055', '#d63031', '#6c5ce7', '#0984e3'
+      // Reds and Pinks
+      '#ff6b6b', '#ff7675', '#fd79a8', '#e84393', '#d63031',
+      '#c0392b', '#e55039', '#eb4d4b', '#ff4757', '#ff7f50',
+      // Oranges and Yellows
+      '#feca57', '#fdcb6e', '#f1c40f', '#f39c12', '#e17055',
+      '#ff9f43', '#ee5a24', '#d35400', '#e67e22', '#f39c12',
+      // Greens and Teals
+      '#48dbfb', '#74b9ff', '#00cec9', '#10ac84', '#00b894',
+      '#55efc4', '#00d2d3', '#16a085', '#1abc9c', '#2ecc71',
+      // Blues and Purples
+      '#54a0ff', '#5f27cd', '#6c5ce7', '#a29bfe', '#0984e3',
+      '#3498db', '#2980b9', '#8e44ad', '#9b59b6', '#6c5ce7',
+      // Special colors
+      '#ffd700', '#c0c0c0', '#ffffff', '#7fff00', '#ff00ff',
+      '#00ffff', '#ff1493', '#00ff00', '#ff6347', '#20b2aa'
     ];
 
     // Create varied bursts across the screen
     const burstCount = 15;
+    const shapes = ['circle', 'star', 'diamond', 'triangle', 'heart', 'square'];
 
     for (let burst = 0; burst < burstCount; burst++) {
       const burstX = Math.random() * window.innerWidth;
       const burstY = Math.random() * window.innerHeight;
+      const dominantShape = shapes[Math.floor(Math.random() * shapes.length)];
 
-      // Variety: each burst has different characteristics
       const variety = Math.random();
 
       let particleCount = 40;
@@ -300,6 +312,8 @@
       for (let i = 0; i < particleCount; i++) {
         const angle = Math.random() * Math.PI * 2;
         const velocity = (Math.random() * 6 + 2) * velocityMultiplier;
+        const shape = Math.random() < 0.7 ? dominantShape : shapes[Math.floor(Math.random() * shapes.length)];
+
         particles.push({
           x: burstX, y: burstY,
           vx: Math.cos(angle) * velocity,
@@ -308,7 +322,10 @@
           alpha: 1,
           decay: Math.random() * 0.02 + 0.01,
           size: (Math.random() * 3 + 1) * sizeMultiplier,
-          hasSparkle: Math.random() < 0.15
+          hasSparkle: Math.random() < 0.15,
+          shape: shape,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.2
         });
       }
     }
@@ -325,10 +342,13 @@
         p.x += p.vx;
         p.y += p.vy;
         p.alpha -= p.decay;
+        p.rotation += p.rotationSpeed;
 
         if (p.alpha > 0) {
           ctx.save();
           ctx.globalAlpha = p.alpha;
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
 
           if (p.hasSparkle) {
             ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : p.color;
@@ -338,9 +358,7 @@
             ctx.fillStyle = p.color;
           }
 
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
+          drawParticleShape(ctx, p.shape, p.size);
           ctx.restore();
           alive.push(p);
         }
@@ -355,6 +373,80 @@
       }
     }
     animate();
+  }
+
+  function drawParticleShape(context, shape, size) {
+    const s = size;
+
+    switch (shape) {
+      case 'star':
+        drawStar(context, 0, 0, 5, s, s / 2);
+        break;
+      case 'diamond':
+        context.beginPath();
+        context.moveTo(0, -s);
+        context.lineTo(s * 0.6, 0);
+        context.lineTo(0, s);
+        context.lineTo(-s * 0.6, 0);
+        context.closePath();
+        context.fill();
+        break;
+      case 'triangle':
+        context.beginPath();
+        context.moveTo(0, -s);
+        context.lineTo(s * 0.866, s * 0.5);
+        context.lineTo(-s * 0.866, s * 0.5);
+        context.closePath();
+        context.fill();
+        break;
+      case 'heart':
+        drawHeart(context, 0, 0, s);
+        break;
+      case 'square':
+        context.fillRect(-s, -s, s * 2, s * 2);
+        break;
+      default: // circle
+        context.beginPath();
+        context.arc(0, 0, s, 0, Math.PI * 2);
+        context.fill();
+    }
+  }
+
+  function drawStar(context, cx, cy, spikes, outerRadius, innerRadius) {
+    let rot = Math.PI / 2 * 3;
+    let x = cx;
+    let y = cy;
+    const step = Math.PI / spikes;
+
+    context.beginPath();
+    context.moveTo(cx, cy - outerRadius);
+
+    for (let i = 0; i < spikes; i++) {
+      x = cx + Math.cos(rot) * outerRadius;
+      y = cy + Math.sin(rot) * outerRadius;
+      context.lineTo(x, y);
+      rot += step;
+
+      x = cx + Math.cos(rot) * innerRadius;
+      y = cy + Math.sin(rot) * innerRadius;
+      context.lineTo(x, y);
+      rot += step;
+    }
+
+    context.lineTo(cx, cy - outerRadius);
+    context.closePath();
+    context.fill();
+  }
+
+  function drawHeart(context, x, y, size) {
+    const s = size * 0.8;
+    context.beginPath();
+    context.moveTo(x, y + s * 0.3);
+    context.bezierCurveTo(x, y - s * 0.5, x - s, y - s * 0.5, x - s, y + s * 0.2);
+    context.bezierCurveTo(x - s, y + s * 0.7, x, y + s, x, y + s);
+    context.bezierCurveTo(x, y + s, x + s, y + s * 0.7, x + s, y + s * 0.2);
+    context.bezierCurveTo(x + s, y - s * 0.5, x, y - s * 0.5, x, y + s * 0.3);
+    context.fill();
   }
 
   // Play a pop sound using Web Audio API
