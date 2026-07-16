@@ -5,7 +5,7 @@ A fun Firefox extension that displays colorful fireworks animation on web pages 
 ## 🎆 New Features (v2.0)
 
 - **URL Whitelist Mode**: Configure specific websites or pages where fireworks should appear
-- **Custom Button Selectors**: Target specific buttons using CSS selectors
+- **Customom Button Selectors**: Target specific buttons using CSS selectors
 - **Options Page**: Beautiful settings UI to configure all options
 - **Storage Persistence**: Settings are saved and persist across browser sessions
 
@@ -13,7 +13,7 @@ A fun Firefox extension that displays colorful fireworks animation on web pages 
 
 - 🎆 Colorful particle fireworks animation
 - 🎯 Works on all websites (configurable)
-- 🎪 Custom element targeting with CSS selectors
+- 🎪 Customom element targeting with CSS selectors
 - 🌈 10 different vibrant colors
 - ⚡ Smooth physics-based animation with gravity and friction
 - 🎇 Trail effect for beautiful visuals
@@ -120,8 +120,8 @@ After installation, configure the extension:
    - **Allowed URLs** (if whitelist mode): Add URL patterns like:
      - `https://example.com/*` - All pages on example.com
      - `https://example.com/dashboard` - Specific page only
-   - **Button Configuration**: Choose "All Buttons" or "Custom Selector"
-   - **Custom Button Selector** (if custom mode): Enter CSS selector like:
+   - **Button Configuration**: Choose "All Buttons" or "Customom Selector"
+   - **Customom Button Selector** (if custom mode): Enter CSS selector like:
      - `button.btn.primary` - Buttons with class "btn" and "primary"
      - `button.btn:nth-child(2)` - Second button with class "btn"
      - `.submit-btn` - Elements with class "submit-btn"
@@ -135,10 +135,137 @@ Based on your requirements, configure like this:
 **URL Mode**: Whitelist
 - Add your site URL: `https://your-site.com/*`
 
-**Button Mode**: Custom Selector
+**Button Mode**: Customom Selector
 - Enter: `button.btn:nth-child(2)`
 
 This will only show fireworks on the second button with class "btn" on your whitelisted site.
+
+## Advanced Configuration Examples
+
+### Example 1: Single Page on Specific Domain
+```javascript
+URL Mode: Whitelist
+Allowed URLs:
+- https://github.com/*/pull/*
+
+Button Mode: All Buttons
+```
+*Result: Fireworks appear only on GitHub pull request pages, on any button.*
+
+### Example 2: Specific Button on Multiple Sites
+```javascript
+URL Mode: All Sites
+
+Button Mode: Customom Selector
+Customom Selector: button[type="submit"]
+```
+*Result: Fireworks appear on all submit buttons across all websites.*
+
+### Example 3: Elements with Specific Data Attributes
+```javascript
+URL Mode: Whitelist
+Allowed URLs:
+- https://example.com/*
+- https://staging.example.com/*
+
+Button Mode: Customom Selector
+Customom Selector: [data-action="submit"], [role="button"]
+```
+*Result: Fireworks appear on elements with submit action or button role on example.com domains.*
+
+### Example 4: Combination of Multiple Selectors
+```javascript
+URL Mode: Whitelist
+Allowed URLs:
+- https://dashboard.company.com/*
+
+Button Mode: Customom Selector
+Customom Selector: button.btn-primary, .submit-action, #confirm-button
+```
+*Result: Fireworks appear on primary buttons, submit actions, or confirm button on company dashboard.*
+
+### Example 5: Specific Element in a Container
+```javascript
+URL Mode: Whitelist
+Allowed URLs:
+- https://app.example.com/settings/*
+
+Button Mode: Customom Selector
+Customom Selector: .settings-panel button.save
+```
+*Result: Fireworks appear only on save buttons within settings panels on the settings page.*
+
+### Example 6: Dynamic Pages with Wildcards
+```javascript
+URL Mode: Whitelist
+Allowed URLs:
+- https://*.github.com/*/issues/*
+- https://github.com/*/pull/*
+
+Button Mode: Customom Selector
+Customom Selector: button.js-merge-commit-button
+```
+*Result: Fireworks appear on merge buttons across GitHub issues and pull requests.*
+
+## CSS Selector Tips
+
+### Finding the Right Selector
+1. **Right-click** on the element you want to target
+2. **Select "Inspect"** to open DevTools
+3. **Right-click** the highlighted element in DevTools
+4. **Copy → Copy selector** for the exact CSS selector
+5. **Paste** into the Customom Selector field
+
+### Common CSS Selectors
+```css
+/* By ID */
+#submit-button
+
+/* By Class */
+.btn-primary
+.submit-form
+.action-button
+
+/* By Attribute */
+[data-testid="submit"]
+[type="submit"]
+[role="button"]
+
+/* Combined */
+button.btn-primary.submit
+div.container > button.action
+.settings-panel button[type="submit"]
+
+/* Pseudo-classes */
+button:first-child
+.btn:nth-child(2)
+.submit-btn:hover
+```
+
+### Testing Your Selector
+1. Open browser console (F12)
+2. Test selector: `document.querySelector('your-selector')`
+3. If it returns an element, your selector is correct
+4. If it returns `null`, try a more specific selector
+
+## URL Pattern Examples
+
+### Wildcard Patterns
+```
+https://example.com/*           # All pages on example.com
+https://*.example.com/*         # All subdomains
+*://*.github.com/*              # GitHub across all protocols
+https://github.com/*/issues/*   # All GitHub issue pages
+https://example.com/page        # Specific page only
+```
+
+### Multiple URL Patterns
+```
+https://github.com/*
+https://gitlab.com/*
+https://bitbucket.org/*
+```
+*Result: Fireworks appear on all code hosting platforms.*
 
 ## How It Works
 
@@ -159,7 +286,7 @@ The extension uses:
 - `<input type="button">`
 - `<input type="submit">`
 
-### Custom Mode
+### Customom Mode
 Any CSS selector you specify:
 - Class selectors: `.my-button`
 - ID selectors: `#submit-btn`
@@ -175,7 +302,7 @@ Any CSS selector you specify:
 - `options.js` - Settings logic
 - `icons/` - SVG icons for the extension
 
-## Customization
+## Customomization
 
 ### Adjust Fireworks Size
 
@@ -210,7 +337,7 @@ To find the exact selector for your button:
 3. In the DevTools panel:
    - Right-click the highlighted element
    - Select "Copy" → "Copy selector"
-4. Paste into the "Custom Button Selector" field
+4. Paste into the "Customom Button Selector" field
 
 ## Troubleshooting
 

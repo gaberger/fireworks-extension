@@ -61,6 +61,96 @@ Then load the extension in your browser's developer mode.
 - **Performance**: Optimized particle system with physics
 - **Compatibility**: Cross-browser with fallback support
 
+## ⚙️ Configuration Examples
+
+### Example 1: GitHub Pull Request Pages
+```javascript
+URL Mode: Whitelist
+Allowed URLs:
+- https://github.com/*/pull/*
+
+Button Mode: All Buttons
+```
+*Fireworks appear only on GitHub pull request pages*
+
+### Example 2: Submit Buttons on All Sites
+```javascript
+URL Mode: All Sites
+
+Button Mode: Custom Selector
+Custom Selector: button[type="submit"]
+```
+*Fireworks appear on all submit buttons across all websites*
+
+### Example 3: Multiple Domains with Specific Triggers
+```javascript
+URL Mode: Whitelist
+Allowed URLs:
+- https://github.com/*
+- https://gitlab.com/*
+
+Button Mode: Custom Selector
+Custom Selector: button.btn-primary, .merge-button
+```
+*Fireworks appear on primary and merge buttons on GitHub/GitLab*
+
+### Example 4: Company Dashboard
+```javascript
+URL Mode: Whitelist
+Allowed URLs:
+- https://dashboard.company.com/*
+
+Button Mode: Custom Selector
+Custom Selector: [data-action="submit"], [role="button"]
+```
+*Fireworks appear on submit actions and button roles on company dashboard*
+
+## 📋 CSS Selector Guide
+
+### Finding Selectors
+1. Right-click on an element
+2. Select "Inspect" 
+3. Right-click the highlighted element
+4. Choose "Copy → Copy selector"
+
+### Common Selectors
+```css
+/* By ID */
+#submit-button
+
+/* By Class */  
+.btn-primary
+.submit-form
+
+/* By Attribute */
+[data-testid="submit"]
+[type="submit"]
+
+/* Combined */
+button.btn-primary.submit
+div.container > button.action
+
+/* Multiple */
+button.primary, button.secondary, .submit-action
+```
+
+### URL Pattern Examples
+```
+https://example.com/*           # All pages on example.com
+https://*.github.com/*          # All GitHub subdomains
+*://*.github.com/*              # GitHub across all protocols
+https://github.com/*/issues/*   # All GitHub issue pages
+```
+
+## 🧪 Testing Configuration
+
+1. Open browser console (F12)
+2. Test your selector: `document.querySelector('your-selector')`
+3. If it returns an element, your selector is correct
+4. If it returns `null`, try a more specific selector
+
+For more detailed examples, see the [Extension README](firefox-extension/README.md)
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit issues or pull requests.

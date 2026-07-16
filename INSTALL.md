@@ -10,7 +10,11 @@
 
 2. **Extract and Install**
    - Extract the zip file to a folder
-   - **Firefox**: `about:addons` → Gear → "Install Add-on From File..." → Select `manifest.json`
+   - **Firefox**: Use temporary loading (recommended - bypasses verification):
+     - Go to `about:debugging#/runtime/this-firefox`
+     - Click "Load Temporary Add-on..."
+     - Navigate to extracted folder
+     - Select `manifest.json` (or any file in folder)
    - **Chrome**: `chrome://extensions/` → "Developer mode" → "Load unpacked" → Select folder
    - **DuckDuckGo**: Similar to Chrome
 
@@ -40,6 +44,13 @@
 6. Extension loads immediately
 
 **Note**: Temporary extensions are removed when Firefox restarts.
+
+**⚠️ Important Firefox Verification Issue:**
+- **"Extension has not been verified" error is normal** for development extensions
+- **Solution**: Use the temporary loading method above (bypasses verification)
+- **Alternative**: Enable unsigned extensions in `about:config`:
+  - Set `xpinstall.signatures.required` to `false`
+  - **Warning**: This reduces browser security
 
 ### Chrome/Chromium Installation
 
@@ -89,6 +100,18 @@ After installation, configure the extension:
 - Use browser console (F12) and type `testLogo()` to test logo rendering
 
 ## Troubleshooting
+
+**"Extension has not been verified" Error (Firefox)**
+- **This is normal** for development/unsigned extensions
+- **Solution 1 (Recommended)**: Use temporary loading method:
+  - Go to `about:debugging#/runtime/this-firefox`
+  - Click "Load Temporary Add-on..."
+  - Select the extension folder
+  - Extension loads without verification
+- **Solution 2**: Enable unsigned extensions in `about:config`:
+  - Search for `xpinstall.signatures.required`
+  - Set to `false`
+  - Note: This reduces browser security
 
 **Fireworks not appearing:**
 - Check browser console (F12) for errors
