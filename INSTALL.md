@@ -2,7 +2,19 @@
 
 ## Quick Start
 
-### Clone and Install
+### Option 1: Download Release Package (Recommended)
+
+1. **Download the Latest Release**
+   - Visit: https://github.com/gaberger/fireworks-extension/releases/latest
+   - Download `fireworks-extension-v2.0.zip` (20KB)
+
+2. **Extract and Install**
+   - Extract the zip file to a folder
+   - **Firefox**: `about:addons` → Gear → "Install Add-on From File..." → Select `manifest.json`
+   - **Chrome**: `chrome://extensions/` → "Developer mode" → "Load unpacked" → Select folder
+   - **DuckDuckGo**: Similar to Chrome
+
+### Option 2: Clone and Install
 
 1. **Download the Extension**
    ```bash
