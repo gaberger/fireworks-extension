@@ -1,0 +1,27 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+*.zip
+*.xpi
+dist/
+build/
+
+# Node modules (if using npm)
+node_modules/
+package-lock.json
+
+# Claude files
+.claude/
+
+# Temporary files
+*.tmp
+*.temp
+*.log

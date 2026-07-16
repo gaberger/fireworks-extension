@@ -19,6 +19,7 @@
   let logoShowing = false;
   let logoImage = null;
   let logoStartTime = 0;
+  let logoBlobUrl = null;
 
   // Forward Networks SVG logo (inline)
   const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 22" width="340" height="44">
@@ -37,19 +38,23 @@
       const img = new Image();
       img.onload = () => {
         logoImage = img;
-        console.log('✅ Logo loaded successfully');
-        URL.revokeObjectURL(url);
+        console.log('✅ Logo loaded successfully, dimensions:', img.width, 'x', img.height);
+        // Don't revoke URL immediately - keep it for redraws
         resolve(img);
       };
       img.onerror = (e) => {
         console.error('❌ Logo failed to load:', e);
+        if (logoBlobUrl) {
+          URL.revokeObjectURL(logoBlobUrl);
+          logoBlobUrl = null;
+        }
         reject(e);
       };
 
       const svgBlob = new Blob([logoSvg], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
+      logoBlobUrl = URL.createObjectURL(svgBlob);
       console.log('📥 Loading logo from SVG Blob...');
-      img.src = url;
+      img.src = logoBlobUrl;
     });
   }
 
@@ -171,6 +176,7 @@
       height: 100vh;
       pointer-events: none;
       z-index: 999999;
+      background: transparent;
     `;
     ctx = canvas.getContext('2d');
 
@@ -340,7 +346,13 @@
     const burstCount = 30;
     const shapes = ['circle', 'star', 'diamond', 'triangle', 'heart', 'square'];
 
-    showLogo();
+    // Ensure logo is loaded before showing
+    loadLogoImage().then(() => {
+      showLogo();
+    }).catch(() => {
+      console.log('⚠️ Logo load failed, using fallback');
+      showLogo();
+    });
 
     for (let burst = 0; burst < burstCount; burst++) {
       const burstX = Math.random() * window.innerWidth;
@@ -385,7 +397,7 @@
 
   // Show logo in center of screen
   function showLogo() {
-    console.log('🎆 showLogo called, logoImage:', !!logoImage);
+    console.log('🎆 showLogo called, logoImage:', !!logoImage, 'logoCanvas:', !!logoCanvas);
 
     if (!logoCanvas) {
       logoCanvas = document.createElement('canvas');
@@ -396,17 +408,20 @@
         left: 50%;
         transform: translate(-50%, -50%);
         pointer-events: none;
-        z-index: 2147483647;
+        z-index: 1000000;
       `;
       document.body.appendChild(logoCanvas);
       logoCtx = logoCanvas.getContext('2d');
     }
 
-    logoCanvas.width = 500;
-    logoCanvas.height = 120;
+    // Set canvas size exactly to logo size for transparency
+    logoCanvas.width = 400;
+    logoCanvas.height = 52;
     logoAlpha = 1;
     logoShowing = true;
     logoStartTime = Date.now();
+
+    console.log('🎆 Logo canvas created:', logoCanvas.width, 'x', logoCanvas.height);
   }
 
   // Draw the logo
@@ -416,7 +431,9 @@
       return;
     }
 
+    // Clear canvas completely for transparency
     logoCtx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
+
     logoCtx.save();
     logoCtx.globalAlpha = logoAlpha;
 
@@ -431,21 +448,31 @@
     logoCtx.translate(-centerX, -centerY);
 
     if (logoImage) {
-      const logoWidth = 340;
-      const logoHeight = 44;
+      const logoWidth = 400;
+      const logoHeight = 52;
       const x = (logoCanvas.width - logoWidth) / 2;
       const y = (logoCanvas.height - logoHeight) / 2;
 
-      logoCtx.shadowColor = '#ff3506';
-      logoCtx.shadowBlur = 25;
+      // Add subtle shadow for visibility against any background
+      logoCtx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      logoCtx.shadowBlur = 4;
+      logoCtx.shadowOffsetX = 0;
+      logoCtx.shadowOffsetY = 1;
 
       logoCtx.drawImage(logoImage, x, y, logoWidth, logoHeight);
+      console.log('🎨 Drew transparent logo at:', x, y, 'size:', logoWidth, 'x', logoHeight);
     } else {
+      // Enhanced fallback text with shadow for visibility
+      logoCtx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      logoCtx.shadowBlur = 4;
+      logoCtx.shadowOffsetX = 0;
+      logoCtx.shadowOffsetY = 1;
       logoCtx.fillStyle = '#ff3506';
-      logoCtx.font = 'bold 32px Arial';
+      logoCtx.font = 'bold 36px Arial';
       logoCtx.textAlign = 'center';
       logoCtx.textBaseline = 'middle';
-      logoCtx.fillText('FORWARD NETWORKS', 200, 50);
+      logoCtx.fillText('FORWARD NETWORKS', centerX, centerY);
+      console.log('🎨 Drew fallback text');
     }
 
     logoCtx.restore();
@@ -464,6 +491,11 @@
         logoCanvas = null;
         logoCtx = null;
       }
+      // Clean up Blob URL when logo is completely hidden
+      if (logoBlobUrl) {
+        URL.revokeObjectURL(logoBlobUrl);
+        logoBlobUrl = null;
+      }
     }
   }
 
@@ -471,11 +503,17 @@
   function animate() {
     if (particles.length === 0 && !logoShowing) {
       animationId = null;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Clear fireworks canvas but keep it transparent
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
       return;
     }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Clear only the fireworks canvas, not the logo canvas
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 
     particles = particles.filter(particle => {
       particle.update();
@@ -574,13 +612,33 @@
     if (canvas && canvas.parentNode) {
       canvas.parentNode.removeChild(canvas);
     }
+    // Clean up Blob URL
+    if (logoBlobUrl) {
+      URL.revokeObjectURL(logoBlobUrl);
+      logoBlobUrl = null;
+    }
   });
 
   // Initialize
   setupClickHandler();
 
   // Preload logo image
-  loadLogoImage().catch(() => {
-    console.log('Logo preloading failed, will use fallback');
+  loadLogoImage().then(() => {
+    console.log('✅ Logo preloaded successfully');
+  }).catch((error) => {
+    console.log('❌ Logo preloading failed, will use fallback:', error);
   });
+
+  // Debug function to test logo rendering (call from console)
+  window.testLogo = function() {
+    console.log('🧪 Testing logo rendering...');
+    loadLogoImage().then(() => {
+      console.log('📐 Logo image loaded, dimensions:', logoImage?.width, 'x', logoImage?.height);
+      showLogo();
+      console.log('✅ Logo test complete - check center of screen');
+    }).catch((error) => {
+      console.error('❌ Logo test failed:', error);
+      showLogo(); // Try with fallback
+    });
+  };
 })();

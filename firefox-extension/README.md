@@ -1,6 +1,6 @@
-# Button Fireworks Extension v2.0
+# Fireworks Extension v2.0
 
-A fun Firefox extension that displays colorful fireworks animation when you click buttons on webpages. Now with configurable URL targeting and custom button selectors!
+A fun Firefox extension that displays colorful fireworks animation on web pages with customizable triggers. Now with configurable URL targeting and custom element selectors!
 
 ## 🎆 New Features (v2.0)
 
@@ -13,7 +13,7 @@ A fun Firefox extension that displays colorful fireworks animation when you clic
 
 - 🎆 Colorful particle fireworks animation
 - 🎯 Works on all websites (configurable)
-- 🎪 Custom button targeting with CSS selectors
+- 🎪 Custom element targeting with CSS selectors
 - 🌈 10 different vibrant colors
 - ⚡ Smooth physics-based animation with gravity and friction
 - 🎇 Trail effect for beautiful visuals
@@ -38,7 +38,7 @@ A fun Firefox extension that displays colorful fireworks animation when you clic
    - Click "Open"
 
 3. **Verify Installation**
-   - You should see "Button Fireworks" listed under "Temporary Extensions"
+   - You should see "Fireworks Extension" listed under "Temporary Extensions"
    - The extension is now active!
 
 4. **Important Notes**
@@ -97,7 +97,7 @@ zip -r button-fireworks.zip * -x "*.DS_Store" "*.git*"
 
 1. **Open Settings**
    - Go to `about:addons`
-   - Find "Button Fireworks" in the list
+   - Find "Fireworks Extension" in the list
    - Click the "Preferences" button (three dots → Preferences)
 
 2. **Configure Your Settings**
@@ -108,7 +108,7 @@ zip -r button-fireworks.zip * -x "*.DS_Store" "*.git*"
 After installation, configure the extension:
 
 1. Go to `about:addons`
-2. Find "Button Fireworks" and click "Preferences"
+2. Find "Fireworks Extension" and click "Preferences"
 3. Configure:
    - **URL Configuration**: Choose "All Sites" or "Whitelist" mode
    - **Allowed URLs** (if whitelist mode): Add URL patterns like:
