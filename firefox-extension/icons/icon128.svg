@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="fireworkGradient128" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5f27cd;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" fill="#1a1a2e" rx="20"/>
+  <g transform="translate(64, 64)">
+    <line x1="0" y1="-40" x2="0" y2="40" stroke="url(#fireworkGradient128)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-28" y1="-28" x2="28" y2="28" stroke="url(#fireworkGradient128)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-40" y1="0" x2="40" y2="0" stroke="url(#fireworkGradient128)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-28" y1="28" x2="28" y2="-28" stroke="url(#fireworkGradient128)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-14" y1="-38" x2="14" y2="38" stroke="url(#fireworkGradient128)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-38" y1="-14" x2="38" y2="14" stroke="url(#fireworkGradient128)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-38" y1="14" x2="38" y2="-14" stroke="url(#fireworkGradient128)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-14" y1="38" x2="14" y2="-38" stroke="url(#fireworkGradient128)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="0" cy="0" r="12" fill="#feca57"/>
+  </g>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <radialGradient id="fireworkGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5f27cd;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <rect width="48" height="48" fill="#1a1a2e" rx="8"/>
+  <g transform="translate(24, 24)">
+    <line x1="0" y1="-12" x2="0" y2="12" stroke="url(#fireworkGradient)" stroke-width="2" stroke-linecap="round"/>
+    <line x1="-8.5" y1="-8.5" x2="8.5" y2="8.5" stroke="url(#fireworkGradient)" stroke-width="2" stroke-linecap="round"/>
+    <line x1="-12" y1="0" x2="12" y2="0" stroke="url(#fireworkGradient)" stroke-width="2" stroke-linecap="round"/>
+    <line x1="-8.5" y1="8.5" x2="8.5" y2="-8.5" stroke="url(#fireworkGradient)" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="0" cy="0" r="4" fill="#feca57"/>
+  </g>
+</svg>
