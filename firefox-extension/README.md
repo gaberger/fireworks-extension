@@ -46,6 +46,12 @@ A fun Firefox extension that displays colorful fireworks animation on web pages 
    - Perfect for testing and development
    - Changes to files require reloading (see "Development" section below)
 
+5. **⚠️ Firefox Verification Issue**
+   - If you see "Extension has not been verified", this is **normal** for development extensions
+   - **Solution**: The temporary loading method above bypasses verification
+   - **Alternative**: In `about:config`, set `xpinstall.signatures.required` to `false`
+   - **Warning**: Disabling verification reduces browser security
+
 #### Method 2: Permanent Installation
 
 1. **Package the Extension**
