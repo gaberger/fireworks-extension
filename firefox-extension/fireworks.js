@@ -12,6 +12,10 @@
   let animationId = null;
   let currentSettings = null;
   let audioContext = null;
+  let logoCanvas = null;
+  let logoCtx = null;
+  let logoAlpha = 0;
+  let logoShowing = false;
 
   // Initialize audio context for sound effects
   function initAudio() {
@@ -168,14 +172,14 @@
       const velocity = (Math.random() * 6 + 2) * velocityMultiplier;
       this.vx = Math.cos(angle) * velocity;
       this.vy = Math.sin(angle) * velocity;
-      this.gravity = 0.1;
-      this.friction = 0.98;
+      this.gravity = 0.08; // Slower gravity for longer effect
+      this.friction = 0.985; // Less friction for longer travel
       this.alpha = 1;
-      this.decay = Math.random() * 0.02 + 0.01;
+      this.decay = Math.random() * 0.003 + 0.005; // Lasts ~1000ms
       this.size = (Math.random() * 3 + 1) * sizeMultiplier;
-      this.hasSparkle = Math.random() < 0.15; // 15% chance to sparkle
+      this.hasSparkle = Math.random() < 0.2; // 20% chance to sparkle
       this.rotation = Math.random() * Math.PI * 2;
-      this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+      this.rotationSpeed = (Math.random() - 0.5) * 0.15; // Slower rotation
     }
 
     randomShape() {
@@ -317,7 +321,10 @@
     ];
 
     // Create more varied bursts across the entire screen
-    const burstCount = 15;  // More bursts
+    const burstCount = 30;  // More bursts (doubled)
+
+    // Show logo in center
+    showLogo();
 
     for (let burst = 0; burst < burstCount; burst++) {
       // Random position across the screen
@@ -327,7 +334,7 @@
       // Variety: each burst has different characteristics
       const variety = Math.random();
 
-      let particleCount = 40;
+      let particleCount = 60;  // More particles (increased from 40)
       let velocityMultiplier = 1;
       let sizeMultiplier = 1;
 
@@ -337,17 +344,17 @@
 
       if (variety < 0.25) {
         // Big explosion
-        particleCount = 80;
+        particleCount = 120;  // Increased from 80
         velocityMultiplier = 1.5;
         sizeMultiplier = 1.5;
       } else if (variety < 0.5) {
         // Small burst
-        particleCount = 25;
+        particleCount = 40;  // Increased from 25
         velocityMultiplier = 0.7;
         sizeMultiplier = 0.7;
       } else if (variety < 0.75) {
         // Fast burst
-        particleCount = 50;
+        particleCount = 80;  // Increased from 50
         velocityMultiplier = 2;
         sizeMultiplier = 0.8;
       }
@@ -355,7 +362,7 @@
       // Play pop sound with slight delay
       setTimeout(() => {
         playPopSound();
-      }, burst * 40);
+      }, burst * 25);  // Faster sound timing
 
       // Create burst particles with variety
       for (let i = 0; i < particleCount; i++) {
@@ -371,15 +378,81 @@
     }
   }
 
+  // Show logo in center of screen
+  function showLogo() {
+    if (!logoCanvas) {
+      logoCanvas = document.createElement('canvas');
+      logoCanvas.id = 'fireworks-logo';
+      logoCanvas.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 999998;
+      `;
+      document.body.appendChild(logoCanvas);
+      logoCtx = logoCanvas.getContext('2d');
+    }
+
+    logoCanvas.width = 300;
+    logoCanvas.height = 300;
+    logoAlpha = 1;
+    logoShowing = true;
+  }
+
+  // Draw the logo
+  function drawLogo() {
+    if (!logoShowing || !logoCtx) return;
+
+    logoCtx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
+    logoCtx.save();
+    logoCtx.globalAlpha = logoAlpha;
+
+    // Draw a large firework emoji in center
+    logoCtx.font = '200px Arial';
+    logoCtx.textAlign = 'center';
+    logoCtx.textBaseline = 'middle';
+
+    // Add glow effect
+    logoCtx.shadowColor = '#ffd700';
+    logoCtx.shadowBlur = 30;
+    logoCtx.fillText('🎆', 150, 150);
+
+    // Add text below
+    logoCtx.shadowBlur = 10;
+    logoCtx.font = 'bold 24px Arial';
+    logoCtx.fillStyle = '#ffffff';
+    logoCtx.fillText('FIREWORKS!', 150, 240);
+
+    logoCtx.restore();
+  }
+
+  // Fade out logo
+  function updateLogo() {
+    if (!logoShowing) return;
+
+    logoAlpha -= 0.008;  // Fade out over ~2 seconds
+
+    if (logoAlpha <= 0) {
+      logoShowing = false;
+      if (logoCanvas && logoCanvas.parentNode) {
+        logoCanvas.parentNode.removeChild(logoCanvas);
+        logoCanvas = null;
+        logoCtx = null;
+      }
+    }
+  }
+
   // Animation loop
   function animate() {
-    if (particles.length === 0) {
+    if (particles.length === 0 && !logoShowing) {
       animationId = null;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       return;
     }
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';  // Slower fade for trails
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     particles = particles.filter(particle => {
@@ -387,6 +460,10 @@
       particle.draw(ctx);
       return !particle.isDead();
     });
+
+    // Update and draw logo
+    updateLogo();
+    drawLogo();
 
     animationId = requestAnimationFrame(animate);
   }
