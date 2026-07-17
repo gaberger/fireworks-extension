@@ -63,8 +63,26 @@
     mode: 'whitelist', // Default to whitelist to require configuration
     urls: [],          // Empty URLs means no sites are active
     buttonSelector: '',
-    buttonSelectorMode: 'default'
+    buttonSelectorMode: 'default',
+    duration: 'medium'  // short, medium, long
   };
+
+  // Get duration multiplier based on setting
+  function getDurationMultiplier() {
+    if (!currentSettings || !currentSettings.duration) {
+      return 1.0; // Default medium
+    }
+
+    switch (currentSettings.duration) {
+      case 'short':
+        return 2.0; // 2x faster decay
+      case 'long':
+        return 0.5; // 2x slower decay
+      case 'medium':
+      default:
+        return 1.0; // Normal speed
+    }
+  }
 
   // Load settings from storage
   async function loadSettings() {
@@ -187,7 +205,8 @@
       this.gravity = 0.08;
       this.friction = 0.985;
       this.alpha = 1;
-      this.decay = Math.random() * 0.003 + 0.005;
+      const durationMultiplier = getDurationMultiplier();
+      this.decay = (Math.random() * 0.003 + 0.005) * durationMultiplier;
       this.size = (Math.random() * 3 + 1) * sizeMultiplier;
       this.hasSparkle = Math.random() < 0.2;
       this.rotation = Math.random() * Math.PI * 2;
@@ -462,7 +481,8 @@
   function updateLogo() {
     if (!logoShowing) return;
 
-    logoAlpha -= 0.008;
+    const durationMultiplier = getDurationMultiplier();
+    logoAlpha -= 0.008 * durationMultiplier;
 
     if (logoAlpha <= 0) {
       logoShowing = false;

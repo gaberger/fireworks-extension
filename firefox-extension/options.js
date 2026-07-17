@@ -21,6 +21,11 @@
   const buttonModeHelp = document.getElementById('button-mode-help');
   const buttonSelectorInput = document.getElementById('button-selector');
 
+  const durationShort = document.getElementById('duration-short');
+  const durationMedium = document.getElementById('duration-medium');
+  const durationLong = document.getElementById('duration-long');
+  const durationHelp = document.getElementById('duration-help');
+
   const saveBtn = document.getElementById('save-settings');
   const statusEl = document.getElementById('status');
   const testFireworksBtn = document.getElementById('test-fireworks');
@@ -30,7 +35,8 @@
     mode: 'whitelist',               // Only whitelist mode supported
     urls: [],                        // Array of URL patterns (empty = disabled)
     buttonSelector: '',              // Specific CSS selector for buttons
-    buttonSelectorMode: 'default'    // 'default' (auto-detect) or 'custom' (use selector)
+    buttonSelectorMode: 'default',   // 'default' (auto-detect) or 'custom' (use selector)
+    duration: 'medium'               // 'short', 'medium', or 'long'
   };
 
   // Current settings
@@ -101,6 +107,22 @@
     // Button selector input
     buttonSelectorInput.addEventListener('input', (e) => {
       settings.buttonSelector = e.target.value.trim();
+    });
+
+    // Duration selection
+    durationShort.addEventListener('click', () => {
+      settings.duration = 'short';
+      renderSettings();
+    });
+
+    durationMedium.addEventListener('click', () => {
+      settings.duration = 'medium';
+      renderSettings();
+    });
+
+    durationLong.addEventListener('click', () => {
+      settings.duration = 'long';
+      renderSettings();
     });
 
     // Save settings
@@ -208,6 +230,19 @@
       buttonModeDefault.classList.remove('active');
       buttonSelectorSection.style.display = 'block';
       buttonModeHelp.textContent = 'Fireworks only appear on elements matching your custom CSS selector.';
+    }
+
+    // Update duration selection
+    durationShort.classList.remove('active');
+    durationMedium.classList.remove('active');
+    durationLong.classList.remove('active');
+
+    if (settings.duration === 'short') {
+      durationShort.classList.add('active');
+    } else if (settings.duration === 'medium') {
+      durationMedium.classList.add('active');
+    } else if (settings.duration === 'long') {
+      durationLong.classList.add('active');
     }
 
     // Update button selector input
