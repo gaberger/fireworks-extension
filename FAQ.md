@@ -1,5 +1,27 @@
 # FAQ - Fireworks Extension
 
+## ⚠️ Important v2.1 Changes
+
+### Q: The extension doesn't work anymore! What happened?
+
+**A:** Version 2.1 introduced a **breaking change** - the extension now requires explicit URL configuration:
+
+**Solution:**
+1. Open extension settings
+2. Add your URL pattern (e.g., `https://example.com/*`)
+3. Save settings
+4. Refresh the page
+5. Extension now works on configured URLs only
+
+**Why this change?**
+- Better security and control
+- Prevents accidental activation on unwanted websites
+- More precise control over where fireworks appear
+
+### Q: Can I still use it on all websites?
+
+**A:** No. The "All Sites" mode has been removed for security reasons. You must explicitly configure URL patterns.
+
 ## Common Questions & Solutions
 
 ### Q: I see "Extension has not been verified" error in Firefox. What do I do?

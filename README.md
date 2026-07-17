@@ -5,7 +5,7 @@
 [![Firefox](https://img.shields.io/badge/Firefox-115%2B-orange?logo=firefox&logoColor=white)](https://github.com/gaberger/fireworks-extension)
 [![Chrome](https://img.shields.io/badge/Chrome-Chrome%2B-green?logo=googlechrome&logoColor=white)](https://github.com/gaberger/fireworks-extension)
 
-A fun browser extension that displays colorful fireworks animations with customizable triggers on web pages.
+A fun browser extension that displays colorful fireworks animations on web pages with customizable triggers. **Requires explicit URL configuration** - no longer works on all websites by default.
 
 ## ✨ Features
 
@@ -61,6 +61,8 @@ Then load the extension in your browser's developer mode.
 - **Storage**: Browser storage API for persistent settings
 - **Performance**: Optimized particle system with physics
 - **Compatibility**: Cross-browser with fallback support
+- **Audio**: Improved Web Audio API with softer triangle waves
+- **Security**: Whitelist-only mode requires explicit URL configuration
 
 ## ⚙️ Configuration Examples
 
