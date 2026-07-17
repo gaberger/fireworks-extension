@@ -2,7 +2,8 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/gaberger/fireworks-extension)](https://github.com/gaberger/fireworks-extension/releases/latest)
 [![License](https://img.shields.io/github/license/gaberger/fireworks-extension)](LICENSE)
-[![GitHub Topics](https://img.shields.io/github/topics/gaberger/fireworks-extension/browser-extension)](https://github.com/gaberger/fireworks-extension)
+[![Firefox](https://img.shields.io/badge/Firefox-115%2B-orange?logo=firefox&logoColor=white)](https://github.com/gaberger/fireworks-extension)
+[![Chrome](https://img.shields.io/badge/Chrome-Chrome%2B-green?logo=googlechrome&logoColor=white)](https://github.com/gaberger/fireworks-extension)
 
 A fun browser extension that displays colorful fireworks animations with customizable triggers on web pages.
 
