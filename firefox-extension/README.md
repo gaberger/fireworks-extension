@@ -15,6 +15,7 @@ A fun Firefox extension that displays colorful fireworks animation on web pages 
 - 🎯 Works on all websites (configurable)
 - 🎪 Custom element targeting with CSS selectors
 - 🌈 10 different vibrant colors
+- ⏱️ **Configurable duration** - Short, medium, or long animations
 - ⚡ Smooth physics-based animation with gravity and friction
 - 🎇 Trail effect for beautiful visuals
 - ⚙️ Easy configuration through options page

@@ -74,6 +74,31 @@ For permanent installation:
 
 **A:** No, sound has been permanently disabled for a silent, distraction-free experience. The extension focuses purely on visual fireworks animations.
 
+### Q: How do I change the fireworks duration?
+
+**A:** Duration is now configurable in v2.3:
+
+**Short Duration** (⚡):
+- 2x faster fade
+- Perfect for quick acknowledgments
+- Subtle and minimal
+
+**Medium Duration** (⏱️):
+- Balanced timing (default)
+- Standard fireworks experience
+- Ideal for most occasions
+
+**Long Duration** (🎬):
+- 2x slower fade
+- Extended celebrations
+- Great for major achievements
+
+**To configure:**
+1. Open extension settings
+2. Find \"Animation Duration\" section
+3. Choose your preferred duration
+4. Save settings
+
 ### Q: The extension disappeared after restarting Firefox. What happened?
 
 **A:** Temporary extensions are removed when Firefox restarts. This is expected behavior. Just reload it using the same method.

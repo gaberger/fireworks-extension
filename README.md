@@ -11,6 +11,7 @@ A fun browser extension that displays colorful fireworks animations on web pages
 
 - 🎆 **Colorful Fireworks** - Beautiful particle-based animations with physics
 - 🎯 **Configurable Triggers** - URL whitelisting and custom element selectors
+- ⏱️ **Configurable Duration** - Short, medium, or long animation duration
 - 🌐 **Cross-Browser** - Works on Firefox, Chrome, and DuckDuckGo browsers
 - 🔇 **Sound Disabled** - Silent fireworks experience for minimal distraction
 - 🎨 **Transparent Logo** - Clean Forward Networks branding overlay
