@@ -60,8 +60,8 @@
 
   // Default settings
   const defaultSettings = {
-    mode: 'all',
-    urls: [],
+    mode: 'whitelist', // Default to whitelist to require configuration
+    urls: [],          // Empty URLs means no sites are active
     buttonSelector: '',
     buttonSelectorMode: 'default'
   };
@@ -80,24 +80,48 @@
 
   // Check if current URL should activate
   function shouldActivate(settings) {
-    if (settings.mode === 'all') {
-      return true;
+    // Only activate if in whitelist mode and URLs are configured
+    if (settings.mode !== 'whitelist') {
+      return false;
+    }
+
+    // If no URLs configured, don't activate
+    if (!settings.urls || settings.urls.length === 0) {
+      console.log('🚫 No URLs configured, fireworks disabled');
+      return false;
     }
 
     const currentUrl = window.location.href;
-    return settings.urls.some(pattern => {
+    const matches = settings.urls.some(pattern => {
       return matchUrlPattern(currentUrl, pattern);
     });
+
+    if (!matches) {
+      console.log('🚫 Current URL not in whitelist:', currentUrl);
+    }
+
+    return matches;
   }
 
-  // Match URL against pattern (supports * wildcard)
+  // Match URL against pattern (supports * wildcard and query parameters)
   function matchUrlPattern(url, pattern) {
-    const regexPattern = pattern
-      .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
-      .replace(/\*/g, '.*');
+    // Handle wildcard patterns for query parameters
+    if (pattern.includes('*')) {
+      const regexPattern = pattern
+        .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+        .replace(/\*/g, '.*');
 
+      try {
+        const regex = new RegExp(`^${regexPattern}$`);
+        return regex.test(url);
+      } catch (error) {
+        return false;
+      }
+    }
+
+    // For exact matches without wildcards, also check for query parameter patterns
     try {
-      const regex = new RegExp(`^${regexPattern}$`);
+      const regex = new RegExp(`^${pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&')}$`);
       return regex.test(url);
     } catch (error) {
       return false;
@@ -121,42 +145,27 @@
         ctx.resume();
       }
 
-      console.log('Playing pop sound, context state:', ctx.state);
-
+      // Subtle, pleasant pop sound
       const oscillator = ctx.createOscillator();
       const gainNode = ctx.createGain();
 
       oscillator.connect(gainNode);
       gainNode.connect(ctx.destination);
 
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(400 + Math.random() * 200, ctx.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.15);
+      // Use triangle wave for softer, more pleasant sound
+      oscillator.type = 'triangle';
 
-      gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+      // Randomize pitch slightly for variety
+      const baseFreq = 300 + Math.random() * 150;
+      oscillator.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, ctx.currentTime + 0.1);
+
+      // Softer volume envelope
+      gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
 
       oscillator.start(ctx.currentTime);
-      oscillator.stop(ctx.currentTime + 0.15);
-
-      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
-      const noiseData = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < noiseData.length; i++) {
-        noiseData[i] = (Math.random() * 2 - 1) * 0.15;
-      }
-
-      const noiseSource = ctx.createBufferSource();
-      const noiseGain = ctx.createGain();
-
-      noiseSource.buffer = noiseBuffer;
-      noiseSource.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
-
-      noiseGain.gain.setValueAtTime(0.3, ctx.currentTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
-
-      noiseSource.start(ctx.currentTime);
-      noiseSource.stop(ctx.currentTime + 0.05);
+      oscillator.stop(ctx.currentTime + 0.1);
     } catch (error) {
       console.error('Audio error:', error);
     }

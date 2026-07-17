@@ -269,23 +269,13 @@
     <!-- URL Configuration -->
     <div class="section">
       <h2>URL Configuration</h2>
-      <div class="mode-selector">
-        <div class="mode-option active" data-mode="all" id="mode-all">
-          <span class="mode-icon">🌐</span>
-          All Sites
-        </div>
-        <div class="mode-option" data-mode="whitelist" id="mode-whitelist">
-          <span class="mode-icon">✅</span>
-          Whitelist
-        </div>
-      </div>
-      <div class="help-text" id="url-mode-help">
-        Fireworks appear on buttons across all websites.
+      <div class="help-text">
+        Fireworks only appear on configured websites. Add URLs below to enable fireworks.
       </div>
     </div>
 
     <!-- Whitelist URLs -->
-    <div class="section" id="url-section" style="display: none;">
+    <div class="section" id="url-section">
       <h2>Allowed URLs</h2>
       <div class="url-list">
         <div class="url-item">
@@ -306,7 +296,16 @@
         Use * as wildcard. Examples:<br>
         • https://example.com/* - All pages on example.com<br>
         • https://example.com/dashboard - Specific page only<br>
+        • https://beta3.fwd.app/?/predict?networkId=*&analysisId=*&stepIdx=3 - Wildcard query parameters<br>
         • *://*.github.com/* - All GitHub subdomains
+      </div>
+
+      <div class="selector-examples" style="margin-top: 15px; background: rgba(0, 0, 0, 0.15); border-radius: 6px; padding: 12px;">
+        <h4 style="color: #48dbfb; font-size: 13px; margin: 0 0 8px 0;">Quick Examples (click to add):</h4>
+        <div class="selector-example" style="font-family: 'Courier New', monospace; font-size: 11px; color: rgba(224, 224, 224, 0.7); padding: 4px 0; cursor: pointer; transition: color 0.2s;" data-url="https://*.fwd.app/*">https://*.fwd.app/*</div>
+        <div class="selector-example" style="font-family: 'Courier New', monospace; font-size: 11px; color: rgba(224, 224, 224, 0.7); padding: 4px 0; cursor: pointer; transition: color 0.2s;" data-url="https://beta3.fwd.app/?/predict?*">https://beta3.fwd.app/?/predict?*</div>
+        <div class="selector-example" style="font-family: 'Courier New', monospace; font-size: 11px; color: rgba(224, 224, 224, 0.7); padding: 4px 0; cursor: pointer; transition: color 0.2s;" data-url="https://github.com/*">https://github.com/*</div>
+        <div class="selector-example" style="font-family: 'Courier New', monospace; font-size: 11px; color: rgba(224, 224, 224, 0.7); padding: 4px 0; cursor: pointer; transition: color 0.2s;" data-url="*://localhost:*">*://localhost:*</div>
       </div>
     </div>
 

@@ -27,8 +27,8 @@
 
   // Default settings
   const defaultSettings = {
-    mode: 'all',                     // 'all' or 'whitelist'
-    urls: [],                        // Array of URL patterns
+    mode: 'whitelist',               // Only whitelist mode supported
+    urls: [],                        // Array of URL patterns (empty = disabled)
     buttonSelector: '',              // Specific CSS selector for buttons
     buttonSelectorMode: 'default'    // 'default' (auto-detect) or 'custom' (use selector)
   };
@@ -77,16 +77,8 @@
 
   // Setup event listeners
   function setupEventListeners() {
-    // URL mode selection
-    modeAll.addEventListener('click', () => {
-      settings.mode = 'all';
-      renderSettings();
-    });
-
-    modeWhitelist.addEventListener('click', () => {
-      settings.mode = 'whitelist';
-      renderSettings();
-    });
+    // Always use whitelist mode - removed mode selection
+    settings.mode = 'whitelist';
 
     // Button mode selection
     buttonModeDefault.addEventListener('click', () => {
@@ -126,6 +118,28 @@
         settings.buttonSelector = example.dataset.selector;
         settings.buttonSelectorMode = 'custom';
         renderSettings();
+      });
+    });
+
+    // Quick URL examples
+    document.querySelectorAll('.selector-example[data-url]').forEach(example => {
+      example.addEventListener('click', () => {
+        const url = example.dataset.url;
+        if (!settings.urls.includes(url)) {
+          settings.urls.push(url);
+          renderSettings();
+          showStatus(`URL added: ${url}`, 'success');
+        } else {
+          showStatus('URL already exists', 'error');
+        }
+      });
+
+      // Add hover effect for URL examples
+      example.addEventListener('mouseover', () => {
+        example.style.color = '#feca57';
+      });
+      example.addEventListener('mouseout', () => {
+        example.style.color = 'rgba(224, 224, 224, 0.7)';
       });
     });
   }
@@ -180,18 +194,8 @@
 
   // Render current settings
   function renderSettings() {
-    // Update URL mode selection
-    if (settings.mode === 'all') {
-      modeAll.classList.add('active');
-      modeWhitelist.classList.remove('active');
-      urlSection.style.display = 'none';
-      urlModeHelp.textContent = 'Fireworks appear on buttons across all websites.';
-    } else {
-      modeWhitelist.classList.add('active');
-      modeAll.classList.remove('active');
-      urlSection.style.display = 'block';
-      urlModeHelp.textContent = 'Fireworks only appear on the whitelisted URLs below.';
-    }
+    // Always show URL section (whitelist only mode)
+    urlSection.style.display = 'block';
 
     // Update button mode selection
     if (settings.buttonSelectorMode === 'default') {
@@ -218,7 +222,12 @@
     savedUrlsContainer.innerHTML = '';
 
     if (settings.urls.length === 0) {
-      savedUrlsContainer.innerHTML = '<div style="color: rgba(224,224,224,0.5); padding: 10px; text-align: center;">No URLs added yet</div>';
+      savedUrlsContainer.innerHTML = `
+        <div style="color: rgba(224,224,224,0.5); padding: 15px; text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 8px;">🚫</div>
+          <div>No URLs configured</div>
+          <div style="font-size: 11px; margin-top: 5px;">Fireworks are disabled until you add URLs</div>
+        </div>`;
       return;
     }
 
