@@ -70,6 +70,10 @@ For permanent installation:
 
 **A:** No! Chrome doesn't require extension signing for development, so you won't see this error. Just enable "Developer mode" in `chrome://extensions/` and load unpacked.
 
+### Q: Can I enable sound?
+
+**A:** No, sound has been permanently disabled for a silent, distraction-free experience. The extension focuses purely on visual fireworks animations.
+
 ### Q: The extension disappeared after restarting Firefox. What happened?
 
 **A:** Temporary extensions are removed when Firefox restarts. This is expected behavior. Just reload it using the same method.

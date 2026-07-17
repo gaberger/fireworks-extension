@@ -5,7 +5,7 @@ A fun Firefox extension that displays colorful fireworks animation on web pages 
 ## 🎆 New Features (v2.0)
 
 - **URL Whitelist Mode**: Configure specific websites or pages where fireworks should appear
-- **Customom Button Selectors**: Target specific buttons using CSS selectors
+- **Custom Button Selectors**: Target specific buttons using CSS selectors
 - **Options Page**: Beautiful settings UI to configure all options
 - **Storage Persistence**: Settings are saved and persist across browser sessions
 
@@ -13,11 +13,12 @@ A fun Firefox extension that displays colorful fireworks animation on web pages 
 
 - 🎆 Colorful particle fireworks animation
 - 🎯 Works on all websites (configurable)
-- 🎪 Customom element targeting with CSS selectors
+- 🎪 Custom element targeting with CSS selectors
 - 🌈 10 different vibrant colors
 - ⚡ Smooth physics-based animation with gravity and friction
 - 🎇 Trail effect for beautiful visuals
 - ⚙️ Easy configuration through options page
+- 🔇 **Sound disabled** - Silent fireworks experience
 
 ## Installation
 
@@ -120,8 +121,8 @@ After installation, configure the extension:
    - **Allowed URLs** (if whitelist mode): Add URL patterns like:
      - `https://example.com/*` - All pages on example.com
      - `https://example.com/dashboard` - Specific page only
-   - **Button Configuration**: Choose "All Buttons" or "Customom Selector"
-   - **Customom Button Selector** (if custom mode): Enter CSS selector like:
+   - **Button Configuration**: Choose "All Buttons" or "Custom Selector"
+   - **Custom Button Selector** (if custom mode): Enter CSS selector like:
      - `button.btn.primary` - Buttons with class "btn" and "primary"
      - `button.btn:nth-child(2)` - Second button with class "btn"
      - `.submit-btn` - Elements with class "submit-btn"
@@ -135,7 +136,7 @@ Based on your requirements, configure like this:
 **URL Mode**: Whitelist
 - Add your site URL: `https://your-site.com/*`
 
-**Button Mode**: Customom Selector
+**Button Mode**: Custom Selector
 - Enter: `button.btn:nth-child(2)`
 
 This will only show fireworks on the second button with class "btn" on your whitelisted site.
@@ -156,8 +157,8 @@ Button Mode: All Buttons
 ```javascript
 URL Mode: All Sites
 
-Button Mode: Customom Selector
-Customom Selector: button[type="submit"]
+Button Mode: Custom Selector
+Custom Selector: button[type="submit"]
 ```
 *Result: Fireworks appear on all submit buttons across all websites.*
 
@@ -168,8 +169,8 @@ Allowed URLs:
 - https://example.com/*
 - https://staging.example.com/*
 
-Button Mode: Customom Selector
-Customom Selector: [data-action="submit"], [role="button"]
+Button Mode: Custom Selector
+Custom Selector: [data-action="submit"], [role="button"]
 ```
 *Result: Fireworks appear on elements with submit action or button role on example.com domains.*
 
@@ -179,8 +180,8 @@ URL Mode: Whitelist
 Allowed URLs:
 - https://dashboard.company.com/*
 
-Button Mode: Customom Selector
-Customom Selector: button.btn-primary, .submit-action, #confirm-button
+Button Mode: Custom Selector
+Custom Selector: button.btn-primary, .submit-action, #confirm-button
 ```
 *Result: Fireworks appear on primary buttons, submit actions, or confirm button on company dashboard.*
 
@@ -190,8 +191,8 @@ URL Mode: Whitelist
 Allowed URLs:
 - https://app.example.com/settings/*
 
-Button Mode: Customom Selector
-Customom Selector: .settings-panel button.save
+Button Mode: Custom Selector
+Custom Selector: .settings-panel button.save
 ```
 *Result: Fireworks appear only on save buttons within settings panels on the settings page.*
 
@@ -202,8 +203,8 @@ Allowed URLs:
 - https://*.github.com/*/issues/*
 - https://github.com/*/pull/*
 
-Button Mode: Customom Selector
-Customom Selector: button.js-merge-commit-button
+Button Mode: Custom Selector
+Custom Selector: button.js-merge-commit-button
 ```
 *Result: Fireworks appear on merge buttons across GitHub issues and pull requests.*
 
@@ -214,7 +215,7 @@ Customom Selector: button.js-merge-commit-button
 2. **Select "Inspect"** to open DevTools
 3. **Right-click** the highlighted element in DevTools
 4. **Copy → Copy selector** for the exact CSS selector
-5. **Paste** into the Customom Selector field
+5. **Paste** into the Custom Selector field
 
 ### Common CSS Selectors
 ```css
@@ -286,7 +287,7 @@ The extension uses:
 - `<input type="button">`
 - `<input type="submit">`
 
-### Customom Mode
+### Custom Mode
 Any CSS selector you specify:
 - Class selectors: `.my-button`
 - ID selectors: `#submit-btn`
@@ -302,7 +303,7 @@ Any CSS selector you specify:
 - `options.js` - Settings logic
 - `icons/` - SVG icons for the extension
 
-## Customomization
+## Customization
 
 ### Adjust Fireworks Size
 
@@ -337,7 +338,7 @@ To find the exact selector for your button:
 3. In the DevTools panel:
    - Right-click the highlighted element
    - Select "Copy" → "Copy selector"
-4. Paste into the "Customom Button Selector" field
+4. Paste into the "Custom Button Selector" field
 
 ## Troubleshooting
 

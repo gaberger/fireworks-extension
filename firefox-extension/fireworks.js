@@ -138,37 +138,8 @@
 
   // Play a pop sound using Web Audio API
   function playPopSound() {
-    try {
-      const ctx = initAudio();
-
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
-
-      // Subtle, pleasant pop sound
-      const oscillator = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(ctx.destination);
-
-      // Use triangle wave for softer, more pleasant sound
-      oscillator.type = 'triangle';
-
-      // Randomize pitch slightly for variety
-      const baseFreq = 300 + Math.random() * 150;
-      oscillator.frequency.setValueAtTime(baseFreq, ctx.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, ctx.currentTime + 0.1);
-
-      // Softer volume envelope
-      gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-
-      oscillator.start(ctx.currentTime);
-      oscillator.stop(ctx.currentTime + 0.1);
-    } catch (error) {
-      console.error('Audio error:', error);
-    }
+    // Sound disabled - no audio playback
+    return;
   }
 
   // Initialize canvas overlay
